@@ -76,6 +76,9 @@ const verifyStaffs = async (req, res) => {
     });
   }
 };
+
+
+
 const addFoods = async (req, res) => {
   try {
     const { dishName, dishDescription, dishCategory, dishPrice } = req.body;
@@ -104,19 +107,21 @@ const addFoods = async (req, res) => {
   }
 };
 
+
+
 const validateResAdmin = async (req, res) => {
   try {
     const AuthHeader = req.headers.authorization;
     const retriveToken = AuthHeader && AuthHeader.split(" ")[1];
     const verifyToken = jwt.verify(retriveToken, secretKey);
     if (!verifyToken) {
-       res.status(400).send({
+      res.status(400).send({
         message: "not authenticated",
       });
     } else {
       const retriveAdmin = await resModel.findOne({ _id: verifyToken.aud });
       if (!retriveAdmin) {
-         res.status(400).send({
+        res.status(400).send({
           message: "not authenticated",
         });
       } else {
@@ -132,6 +137,8 @@ const validateResAdmin = async (req, res) => {
     });
   }
 };
+
+
 
 const fetchStaffs = async (req, res) => {
   try {
@@ -149,6 +156,8 @@ const fetchStaffs = async (req, res) => {
     });
   }
 };
+
+
 
 const getStaff = async (req, res) => {
   try {
@@ -173,6 +182,9 @@ const getStaff = async (req, res) => {
     });
   }
 };
+
+
+
 const EditStaffs = async (req, res) => {
   try {
     let id = req.params.id;
@@ -220,6 +232,9 @@ const EditStaffs = async (req, res) => {
     });
   }
 };
+
+
+
 const removeStaff = async (req, res) => {
   try {
     let id = req.params.id;
@@ -247,39 +262,36 @@ const removeStaff = async (req, res) => {
 };
 
 
+
 const ControlllerLogin = async (req, res) => {
   try {
     const email = req.body.email;
     const password = req.body.password;
 
-      const retriveData = await resModel.findOne({ owner_email: email });
-      if (retriveData && retriveData.owner_email==email) {
-      
-         const matchingPasswaord = bcrypt.compare(
-           retriveData.password,
-           password
-         );
-        if (matchingPasswaord) {
-          const { _id } = retriveData.toJSON();
-          const payload = {
-            aud: _id,
-          };
-          const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-          res.send({
-            resId: retriveData._id,
-            message: "success",
-            token: token,
-          });
-        } else {
-          res.status(404).send({
-            message: "Account Not Recognised",
-          });
-        }
+    const retriveData = await resModel.findOne({ owner_email: email });
+    if (retriveData && retriveData.owner_email == email) {
+      const matchingPasswaord = bcrypt.compare(retriveData.password, password);
+      if (matchingPasswaord) {
+        const { _id } = retriveData.toJSON();
+        const payload = {
+          aud: _id,
+        };
+        const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+        res.send({
+          resId: retriveData._id,
+          message: "success",
+          token: token,
+        });
       } else {
         res.status(404).send({
-          message: "Datas Not Authenticated",
+          message: "Account Not Recognised",
         });
       }
+    } else {
+      res.status(404).send({
+        message: "Datas Not Authenticated",
+      });
+    }
   } catch (error) {
     res.status(404).send({
       message: "Somthing Went Worng !!",
@@ -287,11 +299,20 @@ const ControlllerLogin = async (req, res) => {
   }
 };
 
+
+
 const ControlllerLoginWithGoogle = async (req, res) => {
   try {
     const email = req.body.email;
   } catch (error) {}
 };
+
+
+const LogoutAdmin = async (req, res) => {
+  try {
+  } catch (error) {}
+};
+
 module.exports = {
   addStaff,
   verifyStaffs,
@@ -303,4 +324,5 @@ module.exports = {
   removeStaff,
   ControlllerLogin,
   ControlllerLoginWithGoogle,
+  LogoutAdmin,
 };

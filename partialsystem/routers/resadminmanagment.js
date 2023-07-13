@@ -17,6 +17,6 @@ Router.post("/saveStaffEdits/:id",resadminController.EditStaffs);
 Router.get("/removeStaff/:id", resadminController.removeStaff);
 Router.post("/ControllerLogin",resadminController.ControlllerLogin);
 Router.post("/ControllerLoginGoogle", resadminController.ControlllerLoginWithGoogle);
-
+Router.get("/logout",resadminController.LogoutAdmin);
 // Router.get("/fetchFoods",resadminController.fetchFoods);
 module.exports = Router;
