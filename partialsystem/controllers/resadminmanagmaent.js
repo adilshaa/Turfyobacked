@@ -1,11 +1,12 @@
 const staffModel = require("../models/staffs");
 const foodModel = require("../models/foods");
-const resModel=require("../../mainsystem/models/restaurants")
+const jwt = require("jsonwebtoken");
+const resModel = require("../../mainsystem/models/restaurants");
 const bcrypt = require("bcrypt");
 const { findOneAndUpdate } = require("../../mainsystem/models/restaurants");
+const secretKey = "ResturantAdminkey";
 const addStaff = async (req, res) => {
   try {
-    console.log(req.body);
     const {
       employeeName,
       employeePlace,
@@ -16,10 +17,8 @@ const addStaff = async (req, res) => {
       employeeDataOFBirth,
       employeeRole,
     } = req.body;
-    console.log(password);
     const salt = await bcrypt.genSalt(10);
     const bcryptPass = await bcrypt.hash(password, salt);
-    console.log(bcryptPass);
     const savingData = new staffModel({
       username: employeeName,
       place: employeePlace,
@@ -43,7 +42,6 @@ const addStaff = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(400).send({ message: "somthing went worng" });
   }
 };
@@ -51,12 +49,11 @@ const addStaff = async (req, res) => {
 const verifyStaffs = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-    console.log(email, password, role);
     const filterByRole = await staffModel.findOne({
       role: role,
       // username: username,
     });
-    if (filterByRole && filterByRole.email == email ) {
+    if (filterByRole && filterByRole.email == email) {
       const matchingPasswaord = await bcrypt.compare(
         password,
         filterByRole.password
@@ -74,7 +71,6 @@ const verifyStaffs = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(400).send({
       message: "syntax error ",
     });
@@ -82,10 +78,7 @@ const verifyStaffs = async (req, res) => {
 };
 const addFoods = async (req, res) => {
   try {
-    console.log("add food");
     const { dishName, dishDescription, dishCategory, dishPrice } = req.body;
-    console.log(req.body);
-    console.log(req.file.filename);
     const saveFood = new foodModel({
       name: dishName,
       description: dishDescription,
@@ -96,7 +89,6 @@ const addFoods = async (req, res) => {
     });
     const saveResult = await saveFood.save();
     if (saveResult) {
-      console.log("done");
       res.send({
         message: "success",
       });
@@ -113,15 +105,37 @@ const addFoods = async (req, res) => {
 };
 
 const validateResAdmin = async (req, res) => {
-  console.log("ahi");
-  console.log(req.body);
+  try {
+    const AuthHeader = req.headers.authorization;
+    const retriveToken = AuthHeader && AuthHeader.split(" ")[1];
+    const verifyToken = jwt.verify(retriveToken, secretKey);
+    if (!verifyToken) {
+       res.status(400).send({
+        message: "not authenticated",
+      });
+    } else {
+      const retriveAdmin = await resModel.findOne({ _id: verifyToken.aud });
+      if (!retriveAdmin) {
+         res.status(400).send({
+          message: "not authenticated",
+        });
+      } else {
+        res.send({
+          message: "success",
+          data: retriveAdmin,
+        });
+      }
+    }
+  } catch (error) {
+    res.status(404).send({
+      message: "sever error found",
+    });
+  }
 };
 
 const fetchStaffs = async (req, res) => {
   try {
-    console.log("koooi");
     const fetchData = await staffModel.find({});
-    console.log(fetchData);
     if (fetchData) {
       res.send(fetchData);
     } else {
@@ -162,7 +176,6 @@ const getStaff = async (req, res) => {
 const EditStaffs = async (req, res) => {
   try {
     let id = req.params.id;
-    console.log(req.body);
     if (id) {
       const {
         employeeName,
@@ -202,7 +215,6 @@ const EditStaffs = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error);
     res.status(500).send({
       message: "Server Error",
     });
@@ -234,35 +246,44 @@ const removeStaff = async (req, res) => {
   }
 };
 
+
 const ControlllerLogin = async (req, res) => {
   try {
-    const email=req.body.email
-    const password = req.body.password
-    
-    if (email, password) {
+    const email = req.body.email;
+    const password = req.body.password;
+
       const retriveData = await resModel.findOne({ owner_email: email });
-      if (retriveData) {
-        const encodePassword = bcrypt.compare(retriveData.password, password)
-        if (encodePassword) {
+      if (retriveData && retriveData.owner_email==email) {
+      
+         const matchingPasswaord = bcrypt.compare(
+           retriveData.password,
+           password
+         );
+        if (matchingPasswaord) {
+          const { _id } = retriveData.toJSON();
+          const payload = {
+            aud: _id,
+          };
+          const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
           res.send({
             resId: retriveData._id,
-            message:"success"
-          })
+            message: "success",
+            token: token,
+          });
         } else {
           res.status(404).send({
-            message:"Account Not Recognised"
-          })
+            message: "Account Not Recognised",
+          });
         }
       } else {
-         res.status(404).send({
-           message: "Datas Not Authenticated",
-         });
+        res.status(404).send({
+          message: "Datas Not Authenticated",
+        });
       }
-    }
   } catch (error) {
-     res.status(404).send({
-       message: "Somthing Went Worng !!",
-     });
+    res.status(404).send({
+      message: "Somthing Went Worng !!",
+    });
   }
 };
 

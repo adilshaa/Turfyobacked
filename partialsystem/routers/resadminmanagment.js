@@ -10,7 +10,7 @@ const foodDisk = multer({ storage: food_img_Storage });
 Router.post("/addStaffs", resadminController.addStaff);
 Router.post("/verifyStaffs", resadminController.verifyStaffs);
 Router.post("/addfood", foodDisk.single("image"), resadminController.addFoods);
-Router.post("/verifyresadmin", resadminController.validateResAdmin);
+Router.get("/verifyresadmin", resadminController.validateResAdmin);
 Router.get("/fetcheStaffs", resadminController.fetchStaffs);
 Router.get("/getStaff/:id", resadminController.getStaff);
 Router.post("/saveStaffEdits/:id",resadminController.EditStaffs);

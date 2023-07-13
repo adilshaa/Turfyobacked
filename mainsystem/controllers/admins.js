@@ -12,6 +12,7 @@ const superAdminLogin = async (req, res) => {
         if (admindata.password === password) {
           const { _id } = admindata.toJSON();
           console.log(_id);
+          
           const payload = {
             aud: _id,
           };
@@ -46,7 +47,7 @@ const isSuperAdmin = async (req, res) => {
     const headertoken = authHeader && authHeader.split(" ")[1]; // Extract the token from the Authorization header
     console.log(headertoken);
     console.log("check super admin");
-    const claims = jwt.verify(headertoken, "adminSecure");
+    const claims = jwt.verify(headertoken, secretKey);
     console.log(claims);
     // console.log(claims, +"   ", token);
     if (!claims) {
@@ -54,6 +55,8 @@ const isSuperAdmin = async (req, res) => {
       return res.status(401).send({
         message: "unautheticated",
       });
+
+      
     } else {
       console.log("calimed");
       const retrivedata = await adminModel.findOne({ _id: claims.aud });

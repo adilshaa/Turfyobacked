@@ -71,8 +71,6 @@ const register = async (req, res) => {
         owner_number: owner_number,
         status: true,
       };
-      console.log(updatedData);
-      console.log("....");
       const saveRemaingDatas = await restaurantModel.findOneAndUpdate(
         { owner_email: retriveData.owner_email },
         updatedData
@@ -215,3 +213,4 @@ module.exports = {
   listrestaurant,
   SaveEditRes,
 };
+
