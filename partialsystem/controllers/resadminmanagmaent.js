@@ -4,7 +4,9 @@ const jwt = require("jsonwebtoken");
 const resModel = require("../../mainsystem/models/restaurants");
 const bcrypt = require("bcrypt");
 const { findOneAndUpdate } = require("../../mainsystem/models/restaurants");
+const stockModel = require("../models/stocks");
 const secretKey = "ResturantAdminkey";
+
 const addStaff = async (req, res) => {
   try {
     const {
@@ -77,8 +79,6 @@ const verifyStaffs = async (req, res) => {
   }
 };
 
-
-
 const addFoods = async (req, res) => {
   try {
     const { dishName, dishDescription, dishCategory, dishPrice } = req.body;
@@ -106,8 +106,6 @@ const addFoods = async (req, res) => {
     });
   }
 };
-
-
 
 const validateResAdmin = async (req, res) => {
   try {
@@ -138,8 +136,6 @@ const validateResAdmin = async (req, res) => {
   }
 };
 
-
-
 const fetchStaffs = async (req, res) => {
   try {
     const fetchData = await staffModel.find({});
@@ -156,8 +152,6 @@ const fetchStaffs = async (req, res) => {
     });
   }
 };
-
-
 
 const getStaff = async (req, res) => {
   try {
@@ -182,8 +176,6 @@ const getStaff = async (req, res) => {
     });
   }
 };
-
-
 
 const EditStaffs = async (req, res) => {
   try {
@@ -233,8 +225,6 @@ const EditStaffs = async (req, res) => {
   }
 };
 
-
-
 const removeStaff = async (req, res) => {
   try {
     let id = req.params.id;
@@ -260,8 +250,6 @@ const removeStaff = async (req, res) => {
     });
   }
 };
-
-
 
 const ControlllerLogin = async (req, res) => {
   try {
@@ -299,14 +287,32 @@ const ControlllerLogin = async (req, res) => {
   }
 };
 
-
-
+const fetchstocks = async (req, res) => {};
+const addStocks = async (req, res) => {
+  try {
+    if (!req.body)
+      return res.status(404).send({ message: "resourses is missing" });
+    const { stockName, stockQuantity, stockExpairy } = req.body;
+    const createStock = new stockModel({
+      name: stockName,
+      quantity: stockQuantity,
+      expairy_Data: stockExpairy,
+      stockStatus: true, 
+    });
+    let saveResult = await createStock.save();
+    if (!saveResult)
+      return res.status(404).send({ message: "data not stored" });
+    res.send({ message: true });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({ message: "somting went worng" });
+  }
+};
 const ControlllerLoginWithGoogle = async (req, res) => {
   try {
     const email = req.body.email;
   } catch (error) {}
 };
-
 
 const LogoutAdmin = async (req, res) => {
   try {
@@ -325,4 +331,6 @@ module.exports = {
   ControlllerLogin,
   ControlllerLoginWithGoogle,
   LogoutAdmin,
+  fetchstocks,
+  addStocks,
 };
