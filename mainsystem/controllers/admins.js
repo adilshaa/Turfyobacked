@@ -1,98 +1,89 @@
 const adminModel = require("../models/admins");
 const jwt = require("jsonwebtoken");
+let secretKey = "adminSecure";
 
-const superAdminLogin = async (req, res) => {
-  try {
-    let secretKey = "adminSecure";
-    console.log("reached");
-    let { name, email, number, password } = req.body;
-    if (name && email && password) {
+const SuperAdminController = {
+  async superAdminLogin(req, res) {
+    try {
+      let { email, password } = req.body;
+      if ((!email, !password))
+        return res.status(404).send({ message: "not authenticated" });
       let admindata = await adminModel.findOne({ email: email });
-      if (admindata) {
-        if (admindata.password === password) {
-          const { _id } = admindata.toJSON();
-          console.log(_id);
-          
-          const payload = {
-            aud: _id,
-          };
-          const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-          console.log(token);
-          // res.cookie("jwt", token, {
-          //   httpOnly: true,
-          //   amxAge: 24 * 60 * 60 * 1000,
-          // });
-          console.log("success");
-          res.send({ token: token });
-        } else {
-          res.status(400).send({
-            message: "error",
-          });
-        }
-      }
-    } else {
+
+      if (!admindata)
+        return res.status(404).send({ message: "not authenticated" });
+
+      if (admindata.password !== password)
+        return res.status(404).send({ message: "Worng Passowrd" });
+
+      const { _id } = admindata.toJSON();
+
+      const payload = {
+        id: _id,
+      };
+      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+
+      if (!token) return res.status(404).send({ message: "not authenticated" });
+      res.send({ token: token });
+    } catch (error) {
+      console.log(error);
       res.status(400).send({
-        message: "error",
+        message: "Sommthing went worng",
       });
     }
-  } catch (error) {
-    console.log(error);
-    res.status(400).send(error);
-  }
-};
-const isSuperAdmin = async (req, res) => {
-  try {
-    // console.log(req.headers);
-    const authHeader = req.headers.authorization;
-    const headertoken = authHeader && authHeader.split(" ")[1]; // Extract the token from the Authorization header
-    console.log(headertoken);
-    console.log("check super admin");
-    const claims = jwt.verify(headertoken, secretKey);
-    console.log(claims);
-    // console.log(claims, +"   ", token);
-    if (!claims) {
-      console.log("not climed");
-      return res.status(401).send({
-        message: "unautheticated",
-      });
+  },
+  async isSuperAdmin(req, res) {
+    try {
+      // console.log(req.headers);
+      const authHeader = req.headers.authorization;
+      if (!authHeader)
+        return res.status(404).send({ message: "not authenticated" });
+      const headertoken = authHeader && authHeader.split(" ")[1]; // Extract the token from the Authorization header
+      const claims = jwt.verify(headertoken, secretKey);
 
-      
-    } else {
-      console.log("calimed");
-      const retrivedata = await adminModel.findOne({ _id: claims.aud });
+      if (!claims)
+        return res.status(401).send({
+          message: "Not Authenticated",
+        });
+
+      const retrivedata = await adminModel.findOne({ _id: claims.id });
+
+      if (!retrivedata)
+        return res.status(401).send({
+          message: "Not Authenticated",
+        });
       const { password, ...data } = await retrivedata.toJSON();
       res.send(data);
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({
+        message: "Not Authondicated",
+      });
     }
-  } catch (error) {
-    return res.status(400).send({
-      message: "Not Authondicated",
-    });
-  }
-};
-const logOutSuperAdmin = async (req, res) => {
-  try {
-    console.log("out");
-    const authHeader = req.headers.authorization;
-    const headertoken = authHeader && authHeader.split(" ")[1]; // Extract the token from the Authorization header
-    const claims = jwt.verify(headertoken, "adminSecure");
-    console.log(claims);
-    if (claims.aud) {
-      res.send({ message: "sucess" });
-    } else {
-      res.status(404).send({
-        message:"error found"
-      })
-    }
+  },
+  async logOutSuperAdmin(req, res) {
+    try {
+      const authHeader = req.headers.authorization;
 
-  } catch (error) {
-     res.status(401).send({
-       message: "error found",
-     });
-  }
-  
+      if (!authHeader)
+        return res.status(404).send({ message: "not authenticated" });
+
+      const headertoken = authHeader && authHeader.split(" ")[1]; // Extract the token from the Authorization header
+
+      const claims = jwt.verify(headertoken, "adminSecure");
+
+      if (!claims)
+        return res.status(404).send({ message: "not authenticated" });
+
+      res.send({ message: "sucess" });
+
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({
+        message: "error found",
+      });
+    }
+  },
 };
-module.exports = {
-  superAdminLogin,
-  isSuperAdmin,
-  logOutSuperAdmin,
-};
+
+module.exports = SuperAdminController;
