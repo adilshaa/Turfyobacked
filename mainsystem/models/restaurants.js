@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { TurfyoADmin } = require("../../connection/connection");
+const { TurfyoADmin } = require("../../connection/Dbconnection");
 
 const restaurantData = new mongoose.Schema({
   name: {

@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-const { dbKitchen } = require("../../connection/connection");
-
+const { dbKitchen } = require("../../connection/Dbconnection");
 
 const foodsData = mongoose.Schema({
   name: {
@@ -16,10 +15,10 @@ const foodsData = mongoose.Schema({
     type: Number,
   },
   image: {
-    type:String
+    type: String,
   },
   status: {
-    type:Boolean
+    type: Boolean,
   },
   resturantId: {
     type: mongoose.Schema.Types.ObjectId,

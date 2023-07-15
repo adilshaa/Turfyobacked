@@ -9,5 +9,6 @@ const food_img_Storage = multer.diskStorage({
         const name = Date.now() + '-' + file.originalname
         cb(null,name)
     }
+
 })
 module.exports = food_img_Storage;

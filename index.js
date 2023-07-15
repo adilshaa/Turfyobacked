@@ -11,27 +11,22 @@ const superAdminRouter = require("./mainsystem/routers/admin");
 const resAdminRouter = require("./partialsystem/routers/resadminmanagment");
 const diningRouter = require("./partialsystem/routers/diningmanagment");
 const kitcheRouter = require("./partialsystem/routers/kitchenmanagement");
-
-const PORT = 5000;
+const SocketController=require("./partialsystem/controllers/socketControllers")
 
 
 
 const path = require("path");
-const { log } = require("console");
 app.use(express.static(path.join(__dirname, "public")));
+
+
+const PORT = 5000;
+
 
 const server = app.listen(PORT, () => {
   console.log("connected");
 });
 
-
-const socket = require("socket.io")(server, {
-  cors: {
-    origin: "*",
-  },
-});
-
-
+SocketController(server);
 
 app.use(
   cors({
@@ -54,14 +49,6 @@ app.use("/dining", diningRouter);
 app.use("/kitchen", kitcheRouter);
 
 
-
-socket.on("connection", (socket) => {
-  console.log(socket.id);
-  console.log("socket connected");
-  socket.emit("hello", {
-    name: "Emitted",
-  });
-});
 
 
 module.exports = {

@@ -1,5 +1,5 @@
 const foodModel = require("../models/foods");
-
+const { getfoods } = require("./socketControllers");
 const KitcheController = {
   async fetcheFoods(req, res) {
     try {
@@ -28,6 +28,7 @@ const KitcheController = {
         { $set: { status: status } }
       );
       if (listResult) {
+        getfoods();
         res.send({ message: true });
       } else {
         res.status(404).send({
@@ -43,4 +44,4 @@ const KitcheController = {
   },
 };
 
-module.exports=KitcheController
+module.exports = KitcheController;

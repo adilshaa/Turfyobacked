@@ -28,4 +28,5 @@ Router.get("/logout", tokenVerify, resadminController.LogoutAdmin);
 Router.get("/KitchenStocks", tokenVerify, resadminController.fetchstocks);
 Router.post("/addStock", tokenVerify, resadminController.addStocks);
 
+
 module.exports = Router;

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { dbResAdmins } = require("../../connection/connection");
+const { dbResAdmins } = require("../../connection/Dbconnection");
 
 const StaffsData = mongoose.Schema({
   username: {
@@ -20,7 +20,7 @@ const StaffsData = mongoose.Schema({
   },
   password: {
     type: String,
-    required:true
+    required: true,
   },
   age: {
     type: Number,
@@ -44,7 +44,7 @@ const StaffsData = mongoose.Schema({
   },
   resturantId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:"restaurant"
+    ref: "restaurant",
   },
   status: {
     type: Boolean,

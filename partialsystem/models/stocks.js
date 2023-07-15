@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { dbKitchen } = require("../../connection/connection");
+const { dbKitchen } = require("../../connection/Dbconnection");
 
 const stocksModel = mongoose.Schema({
   name: {

@@ -278,8 +278,6 @@ const RestaurantCOntroller = {
   },
   async fetchstocks(req, res) {
     try {
-      console.log("adil" + req.resadmin.id);
-      console.log("stocks");
       const fetchAllStoks = await stockModel.find({}).exec();
       if (!fetchAllStoks)
         return res.status(404).send({ message: "resorse not fetched " });
