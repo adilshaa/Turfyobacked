@@ -1,9 +1,8 @@
 const foodModel = require("../models/foods");
-const { getfoods } = require("./socketControllers");
 const KitcheController = {
   async fetcheFoods(req, res) {
     try {
-      const fetchData = await foodModel.find({}).sort({ status: 0 });
+      const fetchData = await foodModel.find({}).sort({ status: -1 });
       if (fetchData) {
         res.send(fetchData);
       } else {
@@ -28,7 +27,6 @@ const KitcheController = {
         { $set: { status: status } }
       );
       if (listResult) {
-        getfoods();
         res.send({ message: true });
       } else {
         res.status(404).send({
