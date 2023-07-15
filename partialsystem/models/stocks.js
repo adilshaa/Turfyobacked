@@ -18,7 +18,6 @@ const stocksModel = mongoose.Schema({
     type: Boolean,
     index: true,
   },
- 
 });
 
 module.exports = dbKitchen.model("stocks", stocksModel);
