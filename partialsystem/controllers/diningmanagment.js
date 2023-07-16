@@ -6,14 +6,12 @@ const DiningController = {
     try {
       const fetchData = await foodModel
         .find({ status: true })
-        .sort({ status: 1 });
-      if (fetchData) {
-        res.send(fetchData);
-      } else {
-        res.status(404).send({
-          message: "worng",
-        });
-      }
+        .sort({ status: 1 })
+        .exec();
+
+      if (!fetchData)
+        return res.status(404).send({ message: " still processing" });
+      res.send(fetchData);
     } catch (error) {
       console.log(error);
       res.status(404).send({

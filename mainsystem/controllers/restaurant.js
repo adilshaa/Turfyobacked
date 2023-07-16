@@ -7,9 +7,11 @@ const SuperAdminResataurantController = {
   async initialReslogin(req, res) {
     try {
       const { name, email } = req.body;
-      const retriveData = await restaurantModel.findOne({
-        owner_email: email,
-      });
+      const retriveData = await restaurantModel
+        .findOne({
+          owner_email: email,
+        })
+        .exec();
       if (!retriveData)
         return res.status(404).send({ message: "Your Not authenticated" });
 
@@ -39,7 +41,7 @@ const SuperAdminResataurantController = {
     try {
       let resId = req.params.id;
       let email = req.body.owner_email;
-      const retriveData = await restaurantModel.findOne({ _id: resId });
+      const retriveData = await restaurantModel.findOne({ _id: resId }).exec();
       if (!retriveData || retriveData.owner_email != email)
         return res.status(404).send({ message: "Your Not authenticated" });
 
@@ -56,10 +58,9 @@ const SuperAdminResataurantController = {
         owner_number: owner_number,
         status: true,
       };
-      const saveRemaingDatas = await restaurantModel.findOneAndUpdate(
-        { owner_email: retriveData.owner_email },
-        updatedData
-      );
+      const saveRemaingDatas = await restaurantModel
+        .findOneAndUpdate({ owner_email: retriveData.owner_email }, updatedData)
+        .exec();
       if (!saveRemaingDatas)
         return res.status(404).send({ message: "Data not fetched" });
       res.send({ message: "sucess" });
@@ -71,7 +72,7 @@ const SuperAdminResataurantController = {
 
   async getRestaurantsData(req, res) {
     try {
-      const retriveData = await restaurantModel.find({});
+      const retriveData = await restaurantModel.find({}).exec();
       if (!retriveData)
         return res.status(404).send({ message: "Data not fetched" });
       res.send(retriveData);
@@ -86,7 +87,7 @@ const SuperAdminResataurantController = {
     try {
       const id = req.params.id;
       if (!id) return res.status(404).send({ message: "Data not fetched" });
-      const restaurantData = await restaurantModel.findOne({ _id: id });
+      const restaurantData = await restaurantModel.findOne({ _id: id }).exec();
 
       if (!restaurantData)
         return res.status(404).send({ message: "Data not fetched" });
@@ -105,10 +106,9 @@ const SuperAdminResataurantController = {
       const status = req.body.status;
       if (!id && !status)
         return res.status(404).send({ message: "Data not fetched" });
-      const afterResult = await restaurantModel.findOneAndUpdate(
-        { _id: id },
-        { $set: { status: status } }
-      );
+      const afterResult = await restaurantModel
+        .findOneAndUpdate({ _id: id }, { $set: { status: status } })
+        .exec();
       if (!afterResult)
         return res.status(404).send({ message: "Data not updated" });
       res.send({
@@ -131,10 +131,9 @@ const SuperAdminResataurantController = {
         owner_name: owner_name,
       };
       if (!id) return res.status(404).send({ message: "Data not fetched" });
-      const updateResult = await restaurantModel.findOneAndUpdate(
-        { _id: id },
-        updatedData
-      );
+      const updateResult = await restaurantModel
+        .findOneAndUpdate({ _id: id }, updatedData)
+        .exec();
       if (!updateResult)
         return res.status(404).send({ message: "Data not updated" });
       res.send({

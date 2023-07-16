@@ -7,7 +7,7 @@ const tokenVerify = (req, res, next) => {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, secretKey, (err, user) => {
       if (err)return res.status(401).json("Invalid token");
-      req.resadmin = user;
+      req.restuarant = user;
       next();
     });
   } else {

@@ -8,7 +8,7 @@ const SuperAdminController = {
       let { email, password } = req.body;
       if ((!email, !password))
         return res.status(404).send({ message: "not authenticated" });
-      let admindata = await adminModel.findOne({ email: email });
+      let admindata = await adminModel.findOne({ email: email }).exec();
 
       if (!admindata)
         return res.status(404).send({ message: "not authenticated" });
@@ -46,7 +46,7 @@ const SuperAdminController = {
           message: "Not Authenticated",
         });
 
-      const retrivedata = await adminModel.findOne({ _id: claims.id });
+      const retrivedata = await adminModel.findOne({ _id: claims.id }).exec();
 
       if (!retrivedata)
         return res.status(401).send({

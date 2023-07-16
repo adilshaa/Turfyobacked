@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { dbKitchen } = require("../../connection/Dbconnection");
 
-const stocksModel = mongoose.Schema({
+const stocksModel = new mongoose.Schema({
   name: {
     type: String,
     index: true,
@@ -13,6 +13,10 @@ const stocksModel = mongoose.Schema({
   expairy_Data: {
     type: Date,
     index: true,
+  },
+  resturantId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "restaurant",
   },
   stockStatus: {
     type: Boolean,

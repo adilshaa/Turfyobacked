@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { dbResAdmins } = require("../../connection/Dbconnection");
 
-const StaffsData = mongoose.Schema({
+const StaffsData =new  mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -37,7 +37,9 @@ const StaffsData = mongoose.Schema({
   role: {
     type: String,
     required: true,
+    default:"staff"
   },
+
   idproof: {
     type: String,
     // required: true,
@@ -52,4 +54,5 @@ const StaffsData = mongoose.Schema({
   },
 });
 
-module.exports = dbResAdmins.model("staff", StaffsData);
+const staff =dbResAdmins.model("staff", StaffsData);
+module.exports = staff;

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { dbKitchen } = require("../../connection/Dbconnection");
 
-const foodsData = mongoose.Schema({
+const foodsData = new mongoose.Schema({
   name: {
     type: String,
   },

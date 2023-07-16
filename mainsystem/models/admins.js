@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { TurfyoADmin } = require("../../connection/Dbconnection");
-const adminData = mongoose.Schema({
+const adminData =new  mongoose.Schema({
   name: {
     type: String,
     required: true,

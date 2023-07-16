@@ -11,7 +11,6 @@ module.exports = async (server) => {
 
     socket.on("listFoods", async () => {
       let data = await foodsModel.find({ status: true }).sort({ status: 1 });
-      console.log(data);
       console.log("listing");
       io.emit("showFoods", data);
     });
