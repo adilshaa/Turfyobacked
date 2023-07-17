@@ -1,6 +1,24 @@
 const foodModel = require("../models/foods");
-
+const Staff = require("../models/staffs");
+const bcrypt = require("bcrypt");
+const jwt =require("jsonwebtoken")
 const DiningController = {
+  async Login(req, res) {
+    try {
+      if (!req.body)
+        return res.status(404).send({ message: "Resourses are not found" });
+      const { email, password } = req.body;
+      const retriveStaff = await Staff.findOne({ email: email }).exec();
+      if (!retriveStaff)
+        return res.status(404).send({ message: "Your Not authenticated" });
+
+      let encodePas = await bcrypt.compare(retriveStaff.password, password);
+      if (!encodePas)
+        return res.status(404).send({ message: "Your Not authenticated" });
+      0
+      
+    } catch (error) {}
+  },
   async fetchFoodsData(req, res) {
     console.log("am dinig");
     try {

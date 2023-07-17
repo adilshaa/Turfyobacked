@@ -231,7 +231,6 @@ const RestaurantCOntroller = {
       const retriveData = await Restaurant.findOne({
         owner_email: email,
       }).exec();
-       console.log(retriveData);
       if (!retriveData && retriveData.owner_email != email)
         return res.status(400).send({ message: "Your not authenticated" });
 
@@ -239,6 +238,13 @@ const RestaurantCOntroller = {
       if (!matchingPasswaord)
         return res.status(400).send({ message: "Your not authenticated" });
 
+      const updateStatus = await Restaurant.updateOne(
+        { _id: retriveData._id },
+        { $set: { status: true } }
+      ).exec();
+
+      if (!updateStatus)
+        return res.status(400).send({ message: "Still proccessing" });
       const { _id } = retriveData.toJSON();
       const payload = {
         id: _id,
@@ -246,6 +252,42 @@ const RestaurantCOntroller = {
       const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
       res.send({
         resId: retriveData._id,
+        message: "success",
+        token: token,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(404).send({
+        message: "Somthing Went Worng !!",
+      });
+    }
+  },
+  async ControlllerLoginWithGoogle(req, res) {
+    try {
+      const email = req.body.email;
+      if (!email)
+        return res.status(404).send({ message: "resourses are missing" });
+
+      const retrivedata = await Restaurant.findOne({
+        owner_email: email,
+      }).exec();
+      if (!retrivedata)
+        return res.status(404).send({ message: "Wrong email address" });
+
+      const updateStatus = await Restaurant.updateOne(
+        { _id: retrivedata._id },
+        { $set: { status: true } }
+      ).exec();
+
+      if (!updateStatus)
+        return res.status(400).send({ message: "Still proccessing" });
+      const { _id } = retrivedata.toJSON();
+      const payload = {
+        id: _id,
+      };
+      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+      res.send({
+        resId: retrivedata._id,
         message: "success",
         token: token,
       });
@@ -296,41 +338,7 @@ const RestaurantCOntroller = {
       res.status(400).send({ message: "somting went worng" });
     }
   },
-  async ControlllerLoginWithGoogle(req, res) {
-    try {
-      const email = req.body.email;
-      if (!email)
-        return res.status(404).send({ message: "resourses are missing" });
 
-      const retrivedata = Restaurant.findOne({ owner_email: email }).exec();
-      if (!retrivedata)
-        return res.status(404).send({ message: "Wrong email address" });
-      const { _id } = retrivedata.toJSON();
-      const payload = {
-        id: _id,
-      };
-      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-      res.send({
-        resId: retrivedata._id,
-        message: "success",
-        token: token,
-      });
-    } catch (error) {
-      res.status(404).send({
-        message: "Somthing Went Worng !!",
-      });
-    }
-  },
-
-  async LogoutAdmin(req, res) {
-    try {
-      req.restuarant = null
-      res.send({message:"success"})
-    } catch (error) {
-      console.log(error);
-      res.status(400).send({message:"somthing went worng"})
-    }
-  },
   async editStock(req, res) {
     try {
       const { id } = req.params;
@@ -398,6 +406,22 @@ const RestaurantCOntroller = {
       res.send(Tables);
     } catch (error) {
       return res.status(404).send({ message: "Somthing went worng" });
+    }
+  },
+  async LogoutAdmin(req, res) {
+    try {
+      const updateStatus = await Restaurant.updateOne(
+        { _id: req.restuarant.id },
+        { $set: { status: false } }
+      ).exec();
+      if (!updateStatus)
+        return res.status(400).send({ message: "Still proccessing" });
+      req.restuarant = null;
+      res.send({ message: "success" });
+
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({ message: "somthing went worng" });
     }
   },
 };

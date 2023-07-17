@@ -62,7 +62,7 @@ const SuperAdminResataurantController = {
         place: place,
         password: encryptPassword,
         owner_number: owner_number,
-        status: true,
+        status: false,
       };
       const saveRemaingDatas = await restaurantModel
         .findOneAndUpdate({ owner_email: retriveData.owner_email }, updatedData)
