@@ -24,9 +24,10 @@ Router.post("/saveStaffEdits/:id", tokenVerify, resadminController.EditStaffs);
 Router.get("/removeStaff/:id", tokenVerify, resadminController.removeStaff);
 Router.post("/ControllerLogin", resadminController.ControlllerLogin);
 Router.post("/googleLogin", resadminController.ControlllerLoginWithGoogle);
-Router.get("/logout", tokenVerify, resadminController.LogoutAdmin);
 Router.get("/KitchenStocks", tokenVerify, resadminController.fetchstocks);
 Router.post("/addStock", tokenVerify, resadminController.addStocks);
-
+Router.get("/createTable", tokenVerify, resadminController.createTable);
+Router.get("/getTables", tokenVerify, resadminController.getTables);
+Router.get("/logout", tokenVerify, resadminController.LogoutAdmin);
 
 module.exports = Router;

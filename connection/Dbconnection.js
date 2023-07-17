@@ -14,9 +14,13 @@ let dbKitchen = mongoose.createConnection(`mongodb://127.0.0.1:27017/kitchensDat
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
+let dbDining = mongoose.createConnection(`mongodb://127.0.0.1:27017/DiningData`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 module.exports = {
   TurfyoADmin: TurfyoADmin,
   dbResAdmins: dbResAdmins,
-  dbKitchen:dbKitchen
+  dbKitchen: dbKitchen,
+  dbDining:dbDining
 };

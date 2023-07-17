@@ -19,5 +19,9 @@ const DiningController = {
       });
     }
   },
+  async loadTables(req, res) {
+    try {
+    } catch (error) {}
+  },
 };
 module.exports = DiningController;

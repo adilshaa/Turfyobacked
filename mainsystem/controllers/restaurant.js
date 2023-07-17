@@ -30,8 +30,8 @@ const SuperAdminResataurantController = {
           owner_email: email,
         })
         .exec();
-      if (retriveRestaurant)
-        return res.status(404).send({ message: "Your Already registered" });
+      if (!retriveRestaurant)
+        return res.status(404).send({ message: "Your Not registers" });
       res.send({
         message: "sucess",
         resId: retriveRestaurant._id,

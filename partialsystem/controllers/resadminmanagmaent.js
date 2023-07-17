@@ -1,6 +1,7 @@
 const Staff = require("../models/staffs");
 const Food = require("../models/foods");
 const Stock = require("../models/stocks");
+const Table = require("../models/tables");
 const Restaurant = require("../../mainsystem/models/restaurants");
 
 const jwt = require("jsonwebtoken");
@@ -230,6 +231,7 @@ const RestaurantCOntroller = {
       const retriveData = await Restaurant.findOne({
         owner_email: email,
       }).exec();
+       console.log(retriveData);
       if (!retriveData && retriveData.owner_email != email)
         return res.status(400).send({ message: "Your not authenticated" });
 
@@ -322,7 +324,12 @@ const RestaurantCOntroller = {
 
   async LogoutAdmin(req, res) {
     try {
-    } catch (error) {}
+      req.restuarant = null
+      res.send({message:"success"})
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({message:"somthing went worng"})
+    }
   },
   async editStock(req, res) {
     try {
@@ -347,7 +354,52 @@ const RestaurantCOntroller = {
       res.status(404).send({ message: "Somthing went worng " });
     }
   },
+  async createTable(req, res) {
+    try {
+      let id = req.restuarant.id;
+      let tableNumber;
+      const retriveData = await Table.find({ restaurant_id: id })
+        .sort({ table_No: -1 })
+        .limit(1);
+      if (retriveData[0] === undefined) {
+        tableNumber = 1;
+      } else {
+        tableNumber = parseInt(retriveData[0].table_No) + 1;
+      }
+      const TableData = new Table({
+        table_Name: "T",
+        table_No: tableNumber,
+        restaurant_id: id,
+        table_status: false,
+      });
+      if (!TableData)
+        return res.status(404).send({
+          message: "data not saved",
+        });
+      await TableData.save();
+      res.send({
+        message: "Sucess",
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(404).send({
+        message: "Somthing went wrong",
+      });
+    }
+  },
+  async getTables(req, res) {
+    try {
+      let id = req.restuarant.id;
+      if (!id)
+        return res.status(404).send({ message: "your not authenticated" });
+      const Tables = await Table.find({ restaurant_id: id }).exec();
+      if (!Tables)
+        return res.status(404).send({ message: "Resourses not fetched" });
+      res.send(Tables);
+    } catch (error) {
+      return res.status(404).send({ message: "Somthing went worng" });
+    }
+  },
 };
 
 module.exports = RestaurantCOntroller;
-
