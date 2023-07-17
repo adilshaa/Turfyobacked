@@ -1,4 +1,4 @@
-const foodsModel = require("../models/foods");
+const Food = require("../models/foods");
 module.exports = async (server) => {
   const io = require("socket.io")(server, {
     cors: {
@@ -10,7 +10,7 @@ module.exports = async (server) => {
     console.log("Socket Connected With  :=> " + socket.id);
 
     socket.on("listFoods", async () => {
-      let data = await foodsModel.find({ status: true }).sort({ status: 1 });
+      let data = await Food.find({ status: true }).sort({ status: 1 });
       console.log("listing");
       io.emit("showFoods", data);
     });

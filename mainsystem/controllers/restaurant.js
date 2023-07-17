@@ -12,8 +12,8 @@ const SuperAdminResataurantController = {
           owner_email: email,
         })
         .exec();
-      if (!retriveData)
-        return res.status(404).send({ message: "Your Not authenticated" });
+      if (retriveData)
+        return res.status(404).send({ message: "Your Already registered" });
 
       const saveData = new restaurantModel({
         owner_name: name,
@@ -25,10 +25,16 @@ const SuperAdminResataurantController = {
       const saveResult = await saveData.save();
       if (!saveResult)
         return res.status(404).send({ message: "Datas are not saved " });
-
+      const retriveRestaurant = await restaurantModel
+        .findOne({
+          owner_email: email,
+        })
+        .exec();
+      if (retriveRestaurant)
+        return res.status(404).send({ message: "Your Already registered" });
       res.send({
         message: "sucess",
-        resId: retriveData._id,
+        resId: retriveRestaurant._id,
       });
     } catch (error) {
       console.log(error);
@@ -124,11 +130,12 @@ const SuperAdminResataurantController = {
   async SaveEditRes(req, res) {
     try {
       const id = req.params.id;
-      const { name, place, owner_name } = req.body;
+      const { name, place, owner_name, owner_number } = req.body;
       const updatedData = {
         name: name,
         place: place,
         owner_name: owner_name,
+        owner_number: owner_number,
       };
       if (!id) return res.status(404).send({ message: "Data not fetched" });
       const updateResult = await restaurantModel
