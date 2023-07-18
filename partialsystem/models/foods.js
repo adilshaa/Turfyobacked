@@ -25,4 +25,4 @@ const foodsData = new mongoose.Schema({
     ref: "restaurant",
   },
 });
-module.exports = dbKitchen.model("foods", foodsData);
+module.exports = dbKitchen.model("food", foodsData);

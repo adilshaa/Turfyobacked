@@ -24,4 +24,6 @@ const stocksModel = new mongoose.Schema({
   },
 });
 
-module.exports = dbKitchen.model("stocks", stocksModel);
+const Stock = dbKitchen.model("stocks", stocksModel);
+
+module.exports = Stock;

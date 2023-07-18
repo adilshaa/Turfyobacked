@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { dbResAdmins } = require("../../connection/Dbconnection");
 
-const StaffsData =new  mongoose.Schema({
+const StaffsData = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -37,7 +37,7 @@ const StaffsData =new  mongoose.Schema({
   role: {
     type: String,
     required: true,
-    default:"staff"
+    default: "staff",
   },
 
   idproof: {
@@ -54,5 +54,11 @@ const StaffsData =new  mongoose.Schema({
   },
 });
 
-const staff =dbResAdmins.model("staff", StaffsData);
+StaffsData.virtual("restaurant", {
+  ref: "restaurant",
+  localField: "resturantId",
+  foreignField: "_id",
+  justOne: true,
+});
+const staff = dbResAdmins.model("staff", StaffsData);
 module.exports = staff;

@@ -9,6 +9,103 @@ const bcrypt = require("bcrypt");
 const secretKey = "ResturantAdminkey";
 
 const RestaurantCOntroller = {
+  async ControlllerLogin(req, res) {
+    try {
+      const { email, password } = req.body;
+      const retriveData = await Restaurant.findOne({
+        owner_email: email,
+      }).exec();
+      if (!retriveData && retriveData.owner_email != email)
+        return res.status(400).send({ message: "Your not authenticated" });
+
+      const matchingPasswaord = bcrypt.compare(retriveData.password, password);
+      if (!matchingPasswaord)
+        return res.status(400).send({ message: "Your not authenticated" });
+
+      const updateStatus = await Restaurant.updateOne(
+        { _id: retriveData._id },
+        { $set: { status: true } }
+      ).exec();
+
+      if (!updateStatus)
+        return res.status(400).send({ message: "Still proccessing" });
+      const { _id } = retriveData.toJSON();
+      const payload = {
+        id: _id,
+      };
+      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+      res.send({
+        resId: retriveData._id,
+        message: "success",
+        token: token,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(404).send({
+        message: "Somthing Went Worng !!",
+      });
+    }
+  },
+  async ControlllerLoginWithGoogle(req, res) {
+    try {
+      const email = req.body.email;
+      if (!email)
+        return res.status(404).send({ message: "resourses are missing" });
+
+      const retrivedata = await Restaurant.findOne({
+        owner_email: email,
+      }).exec();
+      if (!retrivedata)
+        return res.status(404).send({ message: "Wrong email address" });
+
+      const updateStatus = await Restaurant.updateOne(
+        { _id: retrivedata._id },
+        { $set: { status: true } }
+      ).exec();
+
+      if (!updateStatus)
+        return res.status(400).send({ message: "Still proccessing" });
+      const { _id } = retrivedata.toJSON();
+      const payload = {
+        resId: retrivedata._id,
+        id: _id,
+      };
+      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+      res.send({
+        resId: retrivedata._id,
+        message: "success",
+        token: token,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(404).send({
+        message: "Somthing Went Worng !!",
+      });
+    }
+  },
+
+  async validateResAdmin(req, res) {
+    try {
+      let restuarant = req.restuarant.id;
+      if (!restuarant)
+        return res.status(400).send({
+          message: "not authenticated",
+        });
+      const retriveAdmin = await Restaurant.findOne({ _id: restuarant }).exec();
+      if (!retriveAdmin)
+        return res.status(400).send({
+          message: "not authenticated",
+        });
+      res.send({
+        message: "success",
+        data: retriveAdmin,
+      });
+    } catch (error) {
+      res.status(404).send({
+        message: "sever error found",
+      });
+    }
+  },
   async addStaff(req, res) {
     try {
       let restuarant = req.restuarant.id;
@@ -108,28 +205,6 @@ const RestaurantCOntroller = {
     }
   },
 
-  async validateResAdmin(req, res) {
-    try {
-      let restuarant = req.restuarant.id;
-      if (!restuarant)
-        return res.status(400).send({
-          message: "not authenticated",
-        });
-      const retriveAdmin = await Restaurant.findOne({ _id: restuarant }).exec();
-      if (!retriveAdmin)
-        return res.status(400).send({
-          message: "not authenticated",
-        });
-      res.send({
-        message: "success",
-        data: retriveAdmin,
-      });
-    } catch (error) {
-      res.status(404).send({
-        message: "sever error found",
-      });
-    }
-  },
   async fetchStaffs(req, res) {
     try {
       const fetchData = await Staff.find({}).exec();
@@ -225,79 +300,7 @@ const RestaurantCOntroller = {
       });
     }
   },
-  async ControlllerLogin(req, res) {
-    try {
-      const { email, password } = req.body;
-      const retriveData = await Restaurant.findOne({
-        owner_email: email,
-      }).exec();
-      if (!retriveData && retriveData.owner_email != email)
-        return res.status(400).send({ message: "Your not authenticated" });
 
-      const matchingPasswaord = bcrypt.compare(retriveData.password, password);
-      if (!matchingPasswaord)
-        return res.status(400).send({ message: "Your not authenticated" });
-
-      const updateStatus = await Restaurant.updateOne(
-        { _id: retriveData._id },
-        { $set: { status: true } }
-      ).exec();
-
-      if (!updateStatus)
-        return res.status(400).send({ message: "Still proccessing" });
-      const { _id } = retriveData.toJSON();
-      const payload = {
-        id: _id,
-      };
-      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-      res.send({
-        resId: retriveData._id,
-        message: "success",
-        token: token,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(404).send({
-        message: "Somthing Went Worng !!",
-      });
-    }
-  },
-  async ControlllerLoginWithGoogle(req, res) {
-    try {
-      const email = req.body.email;
-      if (!email)
-        return res.status(404).send({ message: "resourses are missing" });
-
-      const retrivedata = await Restaurant.findOne({
-        owner_email: email,
-      }).exec();
-      if (!retrivedata)
-        return res.status(404).send({ message: "Wrong email address" });
-
-      const updateStatus = await Restaurant.updateOne(
-        { _id: retrivedata._id },
-        { $set: { status: true } }
-      ).exec();
-
-      if (!updateStatus)
-        return res.status(400).send({ message: "Still proccessing" });
-      const { _id } = retrivedata.toJSON();
-      const payload = {
-        id: _id,
-      };
-      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-      res.send({
-        resId: retrivedata._id,
-        message: "success",
-        token: token,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(404).send({
-        message: "Somthing Went Worng !!",
-      });
-    }
-  },
   async fetchstocks(req, res) {
     try {
       const fetchAllStoks = await Stock.find({}).exec();
@@ -418,7 +421,6 @@ const RestaurantCOntroller = {
         return res.status(400).send({ message: "Still proccessing" });
       req.restuarant = null;
       res.send({ message: "success" });
-
     } catch (error) {
       console.log(error);
       res.status(400).send({ message: "somthing went worng" });

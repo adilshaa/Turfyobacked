@@ -16,4 +16,6 @@ const TablesModel = new Schema({
     ref: "restaurant",
   },
 });
-module.exports = dbDining.model("table", TablesModel);
+const Table = dbDining.model("table", TablesModel);
+
+module.exports = Table;
