@@ -49,6 +49,12 @@ Router.get(
   resadminController.fetchstocks
 );
 Router.post("/addStock", resAdmintokenVerify, resadminController.addStocks);
+Router.get(
+  "/loadEditableStock/:id",
+  resAdmintokenVerify,
+  resadminController.loadEditStock
+);
+Router.post("/updateStock/:id",resAdmintokenVerify,resadminController.updateStcok);
 Router.get("/createTable", resAdmintokenVerify, resadminController.createTable);
 Router.get("/getTables", resAdmintokenVerify, resadminController.getTables);
 Router.get("/logout", resAdmintokenVerify, resadminController.LogoutAdmin);

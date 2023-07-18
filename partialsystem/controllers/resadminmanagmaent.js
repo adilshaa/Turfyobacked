@@ -341,6 +341,46 @@ const RestaurantCOntroller = {
       res.status(400).send({ message: "somting went worng" });
     }
   },
+  async loadEditStock(req, res) {
+    try {
+      const { id } = req.params;
+      const retriveStcok = await Stock.findOne({ _id: id }).exec();
+      if (!retriveStcok)
+        return res.status(404).send({
+          message: "resoruse not fetched",
+        });
+      res.send({
+        message: "sucess",
+        stock: retriveStcok,
+      });
+    } catch (error) {
+      res.status(400).send({ message: "somting went worng" });
+    }
+  },
+  async updateStcok(req, res) {
+    try {
+      const { id } = req.params;
+      console.log(id);
+      const { stockName, stockQuantity, stockExpairy } = req.body;
+      const updateData = {
+        name: stockName,
+        quantity: stockQuantity,
+        expairy_Data: stockExpairy,
+      };
+      const updatingDatas = await Stock.findOneAndUpdate(
+        { _id: id },
+        updateData
+      );
+      if (!updatingDatas)
+        return res.status(400).send({
+          message: "not updated",
+        });
+      res.send({ message: "successs" });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send({ message: "somting went worng" });
+    }
+  },
 
   async editStock(req, res) {
     try {
