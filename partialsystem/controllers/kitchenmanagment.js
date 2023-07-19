@@ -91,6 +91,22 @@ const KitcheController = {
       return res.status(400).send({ message: "Somthing went worng" });
     }
   },
+  async logout(req, res) {
+    try {
+      const { id } = req.Staff;
+
+      const updateStatus = await Staff.updateOne(
+        { _id: id },
+        { $set: { status: false } }
+      ).exec();
+      if (!updateStatus)
+        return res.status(400).send({ message: "Status Not upated" });
+      req.Staff = null;
+      res.send({ message: "sucess" });
+    } catch (error) {
+      return res.status(400).send({ message: "Somthing went worng" });
+    }
+  },
 };
 
 module.exports = KitcheController;

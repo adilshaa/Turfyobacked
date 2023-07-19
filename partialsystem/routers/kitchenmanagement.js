@@ -7,5 +7,6 @@ Router.get("/fetchFoods",verifyKitchenStaffs, kitchenController.fetcheFoods);
 Router.post("/listFoods/:id",verifyKitchenStaffs, kitchenController.listFoods);
 Router.post("/loginStaff", kitchenController.Login);
 Router.get("/verfiyStaff", verifyKitchenStaffs, kitchenController.verifyStaff);
+Router.get("/logoutStaff", verifyKitchenStaffs, kitchenController.logout);
 module.exports = Router
 

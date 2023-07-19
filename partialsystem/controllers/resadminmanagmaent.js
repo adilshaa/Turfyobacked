@@ -207,7 +207,8 @@ const RestaurantCOntroller = {
 
   async fetchStaffs(req, res) {
     try {
-      const fetchData = await Staff.find({}).exec();
+      const { id } = req.restuarant;
+      const fetchData = await Staff.find({ resturantId: id }).exec();
       if (!fetchData)
         return res.status(400).send({
           message: "Resourses are not fetched",

@@ -27,6 +27,7 @@ const dinigStaffsVerify = (req, res, next) => {
     next();
   });
 };
+
 const verifyKitchenStaffs = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json("You are not authenticated");

@@ -29,6 +29,14 @@ const DiningController = {
       const gernerateToken = jwt.sign(payload, secretkey, { expiresIn: "1h" });
       if (!gernerateToken)
         return res.status(400).send({ message: "your not authenticated 3" });
+      const updateStaff = await Staff.updateOne(
+        {
+          _id: _id,
+        },
+        { $set: { status: true } }
+      );
+      if (!updateStaff)
+        return res.status(400).send({ message: "your not authenticated 3" });
       const resData = await Restaurnt.findOne({
         _id: retriveStaff.resturantId,
       });
@@ -88,6 +96,23 @@ const DiningController = {
       res.status(404).send({
         message: "worng",
       });
+    }
+  },
+  async logout(req, res) {
+    try {
+      const { id } = req.Staff;
+
+      const updateStatus = await Staff.updateOne(
+        { _id: id },
+        { $set: { status: false } }
+      ).exec();
+      if (!updateStatus)
+        return res.status(400).send({ message: "Status Not upated" });
+      req.Staff = null;
+      res.send({ message: "sucess" });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
     }
   },
 };
