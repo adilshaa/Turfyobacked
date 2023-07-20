@@ -14,10 +14,8 @@ const kitcheRouter = require("./partialsystem/routers/kitchenmanagement");
 const SocketController=require("./partialsystem/controllers/socketControllers")
 
 
-
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
-
 
 
 const PORT = 5000;

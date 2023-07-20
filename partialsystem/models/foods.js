@@ -26,4 +26,4 @@ const foodsData = new mongoose.Schema({
   },
 });
 const Food = dbKitchen.model("food", foodsData);
-module.exports=Food
+module.exports = Food;

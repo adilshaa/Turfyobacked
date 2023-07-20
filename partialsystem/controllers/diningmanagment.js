@@ -28,7 +28,7 @@ const DiningController = {
       };
       const gernerateToken = jwt.sign(payload, secretkey, { expiresIn: "1h" });
       if (!gernerateToken)
-        return res.status(400).send({ message: "your not authenticated 3" });
+        return res.status(400).send({ message: "your not authenticated " });
       const updateStaff = await Staff.updateOne(
         {
           _id: _id,
@@ -36,16 +36,16 @@ const DiningController = {
         { $set: { status: true } }
       );
       if (!updateStaff)
-        return res.status(400).send({ message: "your not authenticated 3" });
+        return res.status(400).send({ message: "your not authenticated " });
       const resData = await Restaurnt.findOne({
         _id: retriveStaff.resturantId,
       });
       if (!resData)
-        return res.status(400).send({ message: "your not authenticated 3" });
+        return res.status(400).send({ message: "Your not a staff" });
       if (resData.status != true)
         return res.status(400).send({ message: "Restaurant Not opened" });
       res.send({
-        resdata: resData,
+        resId: resData._id,
         token: gernerateToken,
         message: "success",
       });
@@ -60,6 +60,14 @@ const DiningController = {
       const { id, resId } = req.Staff;
       if ((!id, !resId))
         return res.status(400).send({ message: "Your Not authenticated" });
+      const cheakRestatus = await Restaurnt.findOne({
+        _id:
+        resId,
+        status: true,
+      }).exec();
+      if (!cheakRestatus) 
+        return res.status(400).send({ message: "Restaurant is clossed" });
+        
       res.send({ message: "success" });
     } catch (error) {
       console.log(error);

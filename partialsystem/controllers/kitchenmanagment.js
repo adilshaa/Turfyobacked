@@ -7,7 +7,10 @@ let secretkey = "KitchenSecret";
 const KitcheController = {
   async fetcheFoods(req, res) {
     try {
-      const fetchData = await Food.find({}).sort({ status: -1 });
+      const { resId } = req.Staff;
+      const fetchData = await Food.find({ resturantId: resId }).sort({
+        status: -1,
+      });
       if (!fetchData)
         return res.status(404).send({
           message: "Datas not fetched",
@@ -71,7 +74,7 @@ const KitcheController = {
       if (resData.status != true)
         return res.status(400).send({ message: "Restaurant Not opened" });
       res.send({
-        resdata: resData,
+        resId: resData._id,
         token: gernerateToken,
         message: "success",
       });
@@ -83,9 +86,16 @@ const KitcheController = {
   async verifyStaff(req, res) {
     try {
       const { id, resId } = req.Staff;
-      if ((!id, !resId))
+      if (!id, !resId)
         return res.status(400).send({ message: "Your Not authenticated" });
-      res.send({ message: "success" });
+      const cheakRestatus = await Restaurnt.findOne({
+        _id: resId,
+        status: true,
+      }).exec();
+      if (!cheakRestatus)
+        return res.status(400).send({ message: "Restaurant is clossed" });
+      res.send({ message: "sucess" });
+      
     } catch (error) {
       console.log(error);
       return res.status(400).send({ message: "Somthing went worng" });
@@ -110,5 +120,3 @@ const KitcheController = {
 };
 
 module.exports = KitcheController;
-
-
