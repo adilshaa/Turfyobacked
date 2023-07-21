@@ -123,6 +123,12 @@ const RestaurantCOntroller = {
         employeeDataOFBirth,
         employeeRole,
       } = req.body;
+
+      const verifyStaff = await Staff.findOne({ email: employeeEmail });
+      if (verifyStaff)
+        return res
+          .status(404)
+          .send({ message: "This email is already registered" });
       const salt = await bcrypt.genSalt(10);
       const bcryptPass = await bcrypt.hash(password, salt);
       if (!bcryptPass)
@@ -255,7 +261,7 @@ const RestaurantCOntroller = {
         employeeDataOFBirth,
         employeeRole,
       } = req.body;
-
+     
       const StaffsData = {
         username: employeeName,
         place: employeePlace,
@@ -265,6 +271,8 @@ const RestaurantCOntroller = {
         dateofbirth: employeeDataOFBirth,
         role: employeeRole,
       };
+
+      const salt = await bcrypt.genSalt(10);
       const saveResult = await Staff.findOneAndUpdate(
         { _id: id },
         StaffsData
@@ -325,13 +333,13 @@ const RestaurantCOntroller = {
         });
       if (!req.body)
         return res.status(404).send({ message: "resourses is missing" });
-      const { stockName, stockQuantity, stockExpairy } = req.body;
+      const { stockName, stockQuantity, stockExpairy, stockprice } = req.body;
       const createStock = new Stock({
         name: stockName,
         quantity: stockQuantity,
         expairy_Data: stockExpairy,
         resturantId: restuarant,
-        stockStatus: true,
+        price:stockprice
       });
       let saveResult = await createStock.save();
       if (!saveResult)
@@ -362,11 +370,12 @@ const RestaurantCOntroller = {
     try {
       const { id } = req.params;
       console.log(id);
-      const { stockName, stockQuantity, stockExpairy } = req.body;
+      const { stockName, stockQuantity, stockExpairy, stockprice } = req.body;
       const updateData = {
         name: stockName,
         quantity: stockQuantity,
         expairy_Data: stockExpairy,
+        price: stockprice,
       };
       const updatingDatas = await Stock.findOneAndUpdate(
         { _id: id },

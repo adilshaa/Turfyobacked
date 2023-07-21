@@ -10,17 +10,20 @@ const stocksModel = new mongoose.Schema({
     type: String,
     index: true,
   },
+  AddingData: {
+    type: Date,
+    default: Date.now
+  },
   expairy_Data: {
     type: Date,
     index: true,
   },
+  price: {
+    type: Number,
+  },
   resturantId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "restaurant",
-  },
-  stockStatus: {
-    type: Boolean,
-    index: true,
   },
 });
 
