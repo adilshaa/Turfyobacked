@@ -5,6 +5,8 @@ const Tables = require("../models/tables");
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Order = require("../models/orders");
+const { default: mongoose } = require("mongoose");
 let secretkey = "DinigSecret";
 const DiningController = {
   async Login(req, res) {
@@ -61,13 +63,12 @@ const DiningController = {
       if ((!id, !resId))
         return res.status(400).send({ message: "Your Not authenticated" });
       const cheakRestatus = await Restaurnt.findOne({
-        _id:
-        resId,
+        _id: resId,
         status: true,
       }).exec();
-      if (!cheakRestatus) 
+      if (!cheakRestatus)
         return res.status(400).send({ message: "Restaurant is clossed" });
-        
+
       res.send({ message: "success" });
     } catch (error) {
       console.log(error);
@@ -104,6 +105,39 @@ const DiningController = {
       res.status(404).send({
         message: "worng",
       });
+    }
+  },
+  async orderFood(req, res) {
+    try {
+      const { resId, id } = req.Staff;
+      console.log(req.body);
+      const orderedItem = req.body;
+      let foodIds = [];
+      let tableId;
+      let totalAmount=0;
+
+      foodIds = orderedItem.map((item) => ({
+        food_id: new mongoose.Types.ObjectId(item.foodId),
+        note: item.foodNote,
+        food_quantity: item.foodQuantity,
+      }));
+      tableId = orderedItem.find((id) => id.tableId);
+      console.log(tableId);
+      orderedItem.map((item) => {
+        totalAmount = totalAmount + item.foodPrice;
+      });
+      const save_Order = new Order({
+        tableId: new mongoose.Types.ObjectId(tableId[0]),
+        staffId: new mongoose.Types.ObjectId(id),
+        resId: new mongoose.Types.ObjectId(resId),
+        foods: foodIds,
+        total_price: totalAmount,
+        order_status: true,
+      });
+      await save_Order.save();
+      if (orderedItem) res.send({ message: true });
+    } catch (error) {
+      console.log(error);
     }
   },
   async logout(req, res) {
