@@ -26,11 +26,20 @@ const KitcheController = {
   async listFoods(req, res) {
     try {
       let id = req.params.id;
-      let status = req.body.status;
+      let stock = req.body.key;
+      const TakeFood = await Food.findById(id).exec();
+      if (stock == 1) {
+        stock = parseInt(TakeFood.stock) + 1;
+        
+      } else {
+        if (parseInt(TakeFood.stock) >0) {
+          stock = parseInt(TakeFood.stock) - 1;
+        }
+      }
 
       const listResult = await Food.updateOne(
         { _id: id },
-        { $set: { status: status } }
+        { $set: { stock: stock } }
       ).exec();
       if (!listResult)
         return res.status(401).send({
@@ -86,7 +95,7 @@ const KitcheController = {
   async verifyStaff(req, res) {
     try {
       const { id, resId } = req.Staff;
-      if (!id, !resId)
+      if ((!id, !resId))
         return res.status(400).send({ message: "Your Not authenticated" });
       const cheakRestatus = await Restaurnt.findOne({
         _id: resId,
@@ -95,12 +104,12 @@ const KitcheController = {
       if (!cheakRestatus)
         return res.status(400).send({ message: "Restaurant is clossed" });
       res.send({ message: "sucess" });
-      
     } catch (error) {
       console.log(error);
       return res.status(400).send({ message: "Somthing went worng" });
     }
   },
+  async fetchOrders(req, res) {},
   async logout(req, res) {
     try {
       const { id } = req.Staff;

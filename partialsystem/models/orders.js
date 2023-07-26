@@ -25,7 +25,11 @@ const orderModel = new mongoose.Schema({
         required: true,
       },
       food_quantity: {
-        type: String,
+        type: Number,
+        default: 1,
+      },
+      food_totalprice: {
+        type: Number,
       },
       note: {
         type: String,
@@ -37,9 +41,9 @@ const orderModel = new mongoose.Schema({
   },
   order_status: {
     type: Boolean,
-    },
+  },
 });
 
-const Order=dbDining.model('order',orderModel)
+const Order = dbDining.model("order", orderModel);
 
 module.exports = Order;

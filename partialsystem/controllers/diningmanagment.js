@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
+const Food = require("../models/foods");
+const Table = require("../models/tables");
 let secretkey = "DinigSecret";
 const DiningController = {
   async Login(req, res) {
@@ -110,32 +112,70 @@ const DiningController = {
   async orderFood(req, res) {
     try {
       const { resId, id } = req.Staff;
-      console.log(req.body);
       const orderedItem = req.body;
       let foodIds = [];
-      let tableId;
-      let totalAmount=0;
+
+      
+      let totalAmount = 0;
 
       foodIds = orderedItem.map((item) => ({
-        food_id: new mongoose.Types.ObjectId(item.foodId),
+        food_id: item.foodId,
         note: item.foodNote,
         food_quantity: item.foodQuantity,
+        food_totalprice: item.foodQuantity * item.foodPrice,
+        tableId: item.tableId,
       }));
-      tableId = orderedItem.find((id) => id.tableId);
-      console.log(tableId);
+
       orderedItem.map((item) => {
-        totalAmount = totalAmount + item.foodPrice;
+        totalAmount = totalAmount + item.foodPrice * item.foodQuantity;
       });
       const save_Order = new Order({
-        tableId: new mongoose.Types.ObjectId(tableId[0]),
-        staffId: new mongoose.Types.ObjectId(id),
-        resId: new mongoose.Types.ObjectId(resId),
+        tableId: foodIds[0].tableId,
+        staffId: id,
+        resId: resId,
         foods: foodIds,
         total_price: totalAmount,
         order_status: true,
       });
-      await save_Order.save();
-      if (orderedItem) res.send({ message: true });
+      let orderResult = await save_Order.save();
+      if (!orderResult)
+        return res.status(400).send({ message: "Order didn't recieved" });
+
+      orderedItem.map(async (data) => {
+        let foodId = data.foodId;
+        let foodQuantity = data.foodQuantity;
+
+        const existingFood = await Food.findById(foodId);
+        console.log(existingFood);
+        if (existingFood.stock < foodQuantity) {
+          throw new Error(`Insufficient quantity for food with ID ${foodId}`);
+        }
+        existingFood.stock -= foodQuantity;
+        await existingFood.save();
+      });
+
+      let chageTableStatus = await Table.updateOne(
+        { _id: foodIds[0].tableId },
+        { $set: { table_status: true } }
+      );
+      if (!chageTableStatus)
+        return res.status(400).send({ message: "Order didn't recieved" });
+      res.send({ message: true });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  async getOrders(req, res) {
+    try {
+      const { resId, id } = req.Staff;
+      const Orders = await Order.find({ resId: resId })
+        .populate("resId", null, Restaurnt)
+        .populate("tableId", null, Tables)
+        .populate("foods.food_id", null, Food)
+        .exec();
+      if (!Orders)
+        return res.status(400).send({ message: "Order data not recieved" });
+      res.send({ orders: Orders });
     } catch (error) {
       console.log(error);
     }

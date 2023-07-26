@@ -20,6 +20,10 @@ const foodsData = new mongoose.Schema({
   status: {
     type: Boolean,
   },
+  stock: {
+    type: Number,
+    default: 0,
+  },
   resturantId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "restaurant",

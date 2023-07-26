@@ -8,5 +8,6 @@ Router.get("/loadTable", dinigStaffsVerify, diningController.loadTables);
 Router.post("/dinigLogin", diningController.Login);
 Router.get("/verifyStaff", dinigStaffsVerify, diningController.verifyStaff);
 Router.get("/logoutStaff", dinigStaffsVerify, diningController.logout);
-Router.post("/orderFoods",dinigStaffsVerify,diningController.orderFood);
+Router.post("/orderFoods", dinigStaffsVerify, diningController.orderFood);
+Router.get("/allOrder", dinigStaffsVerify, diningController.getOrders);
 module.exports = Router;
