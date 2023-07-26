@@ -1,6 +1,6 @@
 const restaurantModel = require("../models/restaurants");
 const bcrypt = require("bcrypt");
-
+const axios = require("axios");
 //restaurants Insitail Data SognUp
 
 const SuperAdminResataurantController = {
@@ -14,7 +14,7 @@ const SuperAdminResataurantController = {
         .exec();
       if (retriveData)
         return res.status(404).send({ message: "Your Already registered" });
-
+      
       const saveData = new restaurantModel({
         owner_name: name,
         owner_email: email,
