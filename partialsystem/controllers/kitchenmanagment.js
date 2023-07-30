@@ -3,6 +3,7 @@ const Restaurnt = require("../../mainsystem/models/restaurants");
 const Staff = require("../models/staffs");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Order = require("../models/orders");
 let secretkey = "KitchenSecret";
 const KitcheController = {
   async fetcheFoods(req, res) {
@@ -30,9 +31,8 @@ const KitcheController = {
       const TakeFood = await Food.findById(id).exec();
       if (stock == 1) {
         stock = parseInt(TakeFood.stock) + 1;
-        
       } else {
-        if (parseInt(TakeFood.stock) >0) {
+        if (parseInt(TakeFood.stock) > 0) {
           stock = parseInt(TakeFood.stock) - 1;
         }
       }
@@ -109,8 +109,21 @@ const KitcheController = {
       return res.status(400).send({ message: "Somthing went worng" });
     }
   },
-  async fetchOrders(req, res) {},
+  async OrderReady(req, res) {
+    try {
+      const { id } = req.params;
+      const SaveResult = await Order.updateOne(
+        { _id: id },
+        { $set: { cooking_Status: true } }
+      ).exec();
+      console.log(SaveResult);
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   async logout(req, res) {
+
     try {
       const { id } = req.Staff;
 

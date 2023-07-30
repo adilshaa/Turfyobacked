@@ -10,4 +10,5 @@ Router.get("/verifyStaff", dinigStaffsVerify, diningController.verifyStaff);
 Router.get("/logoutStaff", dinigStaffsVerify, diningController.logout);
 Router.post("/orderFoods", dinigStaffsVerify, diningController.orderFood);
 Router.get("/allOrder", dinigStaffsVerify, diningController.getOrders);
+Router.get("/filterFood/:id", dinigStaffsVerify, diningController.filterFoods);
 module.exports = Router;

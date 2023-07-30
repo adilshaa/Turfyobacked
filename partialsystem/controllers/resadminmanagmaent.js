@@ -2,6 +2,8 @@ const Staff = require("../models/staffs");
 const Food = require("../models/foods");
 const Stock = require("../models/stocks");
 const Table = require("../models/tables");
+const FoodCategory = require("../models/food-category");
+
 const Restaurant = require("../../mainsystem/models/restaurants");
 
 const jwt = require("jsonwebtoken");
@@ -206,11 +208,133 @@ const RestaurantCOntroller = {
     } catch (error) {
       console.log(error);
       res.status(401).send({
-        message: "error found",
+        message: "Somthing wwnt worng",
+      });
+    }
+  },
+  async filterFoods(req, res) {
+    try {
+      const { id } = req.params;
+      let restuarant = req.restuarant.id;
+      const filterdData = await Food.find({
+        resturantId: restuarant,
+        category: id,
+      })
+        .populate("category", null, FoodCategory)
+        .populate("resturantId", null, Restaurant)
+        .exec();
+      const count = await Food.countDocuments({
+        resturantId: restuarant,
+        category: id,
+      });
+      // console.log(filterdData);
+
+      res.send({ food: filterdData, count: count });
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({
+        message: "Somthing wwnt worng",
       });
     }
   },
 
+  async editFoodImage(req, res) {
+    try {
+      console.log("reached");
+
+      let restuarant = req.restuarant.id;
+      let foodid = req.params.id;
+      let image = req.file.filename;
+      if (!restuarant)
+        return res.status(400).send({
+          message: "not authenticated",
+        });
+      if (!foodid || !image)
+        return res.status(400).send({
+          message: "Image id not recived",
+        });
+
+      const updateImage = await Food.updateOne(
+        { _id: foodid },
+        { $set: { image: image } }
+      );
+      if (!updateImage)
+        return res.status(400).send({
+          message: "Image id not updated",
+        });
+      res.send({ messge: true });
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({
+        message: "error found",
+      });
+    }
+  },
+  async editFoodCnt(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, price } = req.body;
+
+      if (!name || !price)
+        return res.status(400).send({
+          message: "Data Not reciveds",
+        });
+
+      const udataData = {
+        name: name,
+        price: price,
+      };
+      const updateResult = await Food.findByIdAndUpdate(id, udataData).exec();
+      if (!updateResult)
+        return res.status(400).send({
+          message: "Data Not Updated",
+        });
+      res.send({ message: true });
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({
+        message: "error found",
+      });
+    }
+  },
+  async AddFoodCategory(req, res) {
+    try {
+      let { name } = req.body;
+      let restuarant = req.restuarant.id;
+
+      if (!name)
+        return res.status(400).send({
+          message: "Data Not Recived",
+        });
+      name = name.trim();
+      const retriveCategory = await FoodCategory.find({
+        resId: restuarant,
+      }).exec();
+
+      let duplicate = retriveCategory.find((category) => category.name == name);
+      if (duplicate)
+        return res.status(400).send({
+          message: "This item already existing",
+        });
+
+      let saveCategory = new FoodCategory({
+        name: name,
+        resId: restuarant,
+      });
+
+      if (!saveCategory)
+        return res.status(400).send({
+          message: "Data Not Added",
+        });
+      await saveCategory.save();
+      res.send({ message: true });
+    } catch (error) {
+      console.log(error);
+      res.status(401).send({
+        message: "error found",
+      });
+    }
+  },
   async fetchStaffs(req, res) {
     try {
       const { id } = req.restuarant;
@@ -261,7 +385,7 @@ const RestaurantCOntroller = {
         employeeDataOFBirth,
         employeeRole,
       } = req.body;
-     
+
       const StaffsData = {
         username: employeeName,
         place: employeePlace,
@@ -339,7 +463,7 @@ const RestaurantCOntroller = {
         quantity: stockQuantity,
         expairy_Data: stockExpairy,
         resturantId: restuarant,
-        price:stockprice
+        price: stockprice,
       });
       let saveResult = await createStock.save();
       if (!saveResult)
@@ -369,7 +493,6 @@ const RestaurantCOntroller = {
   async updateStcok(req, res) {
     try {
       const { id } = req.params;
-      console.log(id);
       const { stockName, stockQuantity, stockExpairy, stockprice } = req.body;
       const updateData = {
         name: stockName,

@@ -20,10 +20,32 @@ Router.post(
   foodDisk.single("image"),
   resadminController.addFoods
 );
+
+Router.post(
+  "/editImage/:id",
+  resAdmintokenVerify,
+  foodDisk.single("image"),
+  resadminController.editFoodImage
+);
+Router.post(
+  "/editFoodCnt/:id",
+  resAdmintokenVerify,
+  resadminController.editFoodCnt
+);
+Router.get(
+  "/filterFood/:id",
+  resAdmintokenVerify,
+  resadminController.filterFoods
+);
 Router.get(
   "/verifyresadmin",
   resAdmintokenVerify,
   resadminController.validateResAdmin
+);
+Router.post(
+  "/addfoodCategory",
+  resAdmintokenVerify,
+  resadminController.AddFoodCategory
 );
 Router.get(
   "/fetcheStaffs",
@@ -54,7 +76,11 @@ Router.get(
   resAdmintokenVerify,
   resadminController.loadEditStock
 );
-Router.post("/updateStock/:id",resAdmintokenVerify,resadminController.updateStcok);
+Router.post(
+  "/updateStock/:id",
+  resAdmintokenVerify,
+  resadminController.updateStcok
+);
 Router.get("/createTable", resAdmintokenVerify, resadminController.createTable);
 Router.get("/getTables", resAdmintokenVerify, resadminController.getTables);
 Router.get("/logout", resAdmintokenVerify, resadminController.LogoutAdmin);

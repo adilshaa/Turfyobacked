@@ -9,7 +9,8 @@ const foodsData = new mongoose.Schema({
     type: String,
   },
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "foodcategory",
   },
   price: {
     type: Number,

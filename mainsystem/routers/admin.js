@@ -9,3 +9,4 @@ Router.post("/superadminlogin", superadminController.superAdminLogin);
 Router.get("/superAdminStatus", superadminController.isSuperAdmin);
 Router.get("/logoutSuperAdmin", superadminController.logOutSuperAdmin);
 module.exports = Router;
+

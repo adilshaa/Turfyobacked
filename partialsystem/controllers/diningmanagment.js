@@ -9,6 +9,7 @@ const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
 const Food = require("../models/foods");
 const Table = require("../models/tables");
+const FoodCategory = require("../models/food-category");
 let secretkey = "DinigSecret";
 const DiningController = {
   async Login(req, res) {
@@ -115,7 +116,6 @@ const DiningController = {
       const orderedItem = req.body;
       let foodIds = [];
 
-      
       let totalAmount = 0;
 
       foodIds = orderedItem.map((item) => ({
@@ -148,7 +148,10 @@ const DiningController = {
         const existingFood = await Food.findById(foodId);
         console.log(existingFood);
         if (existingFood.stock < foodQuantity) {
-          throw new Error(`Insufficient quantity for food with ID ${foodId}`);
+          return res.status(400).send({
+            message: ` nsufficient quantity for food with ${existingFood.stock}`,
+          });
+          
         }
         existingFood.stock -= foodQuantity;
         await existingFood.save();
@@ -176,6 +179,28 @@ const DiningController = {
       if (!Orders)
         return res.status(400).send({ message: "Order data not recieved" });
       res.send({ orders: Orders });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  async filterFoods(req, res) {
+    try {
+      const { id } = req.params;
+      let restuarant = req.Staff.resId;
+      const filterdData = await Food.find({
+        stock: { $gt: 0 },
+        resturantId: restuarant,
+        category: id,
+      })
+        .populate("category", null, FoodCategory)
+        .populate("resturantId", null, Restaurnt)
+        .exec();
+      const count = await Food.countDocuments({
+        resturantId: restuarant,
+        category: id,
+      });
+      // console.log(filterdData);
+      res.send({ food: filterdData, count: count });
     } catch (error) {
       console.log(error);
     }

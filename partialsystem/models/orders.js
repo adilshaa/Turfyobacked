@@ -42,6 +42,10 @@ const orderModel = new mongoose.Schema({
   order_status: {
     type: Boolean,
   },
+  cooking_Status: {
+    type: Boolean,
+    default:true
+  },
 });
 
 const Order = dbDining.model("order", orderModel);

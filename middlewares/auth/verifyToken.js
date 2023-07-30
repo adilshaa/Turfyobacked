@@ -13,8 +13,8 @@ const resAdmintokenVerify = (req, res, next) => {
     req.restuarant = user;
     next();
   });
-
 };
+
 
 const dinigStaffsVerify = (req, res, next) => {
   const authHeader = req.headers.authorization;
