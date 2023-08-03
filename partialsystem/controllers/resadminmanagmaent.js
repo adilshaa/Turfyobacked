@@ -8,8 +8,8 @@ const Restaurant = require("../../mainsystem/models/restaurants");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { composeEmailToStaff } = require("../mail/nodemail");
 const secretKey = "ResturantAdminkey";
-
 const RestaurantCOntroller = {
   async ControlllerLogin(req, res) {
     try {
@@ -36,6 +36,8 @@ const RestaurantCOntroller = {
         id: _id,
       };
       const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+      composeEmailToStaff();
+
       res.send({
         resId: retriveData._id,
         message: "success",
@@ -73,6 +75,7 @@ const RestaurantCOntroller = {
         id: _id,
       };
       const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+
       res.send({
         resId: retrivedata._id,
         message: "success",
@@ -146,12 +149,21 @@ const RestaurantCOntroller = {
         role: employeeRole,
         resturantId: restuarant,
         status: false,
-        // resturantId: resturantId,
       });
       const savingResult = await savingData.save();
 
       if (!savingResult)
         return res.status(404).send({ message: "Datas not saved" });
+      const retrieRestarurantData = await Restaurant.findById(
+        restuarant
+      ).exec();
+      const StaffEmailData = {
+        staffname: employeeName,
+        resName: retrieRestarurantData.name,
+        staffEmail: employeeEmail,
+        resEmail: retrieRestarurantData.owner_email,
+      };
+      composeEmailToStaff(StaffEmailData);
       res.send({
         message: "saving process over",
       });
@@ -160,6 +172,7 @@ const RestaurantCOntroller = {
       res.status(400).send({ message: "somthing went worng" });
     }
   },
+
   async verifyStaffs(req, res) {
     try {
       const { email, password, role } = req.body;
@@ -372,6 +385,7 @@ const RestaurantCOntroller = {
   },
   async EditStaffs(req, res) {
     try {
+      let restuarant=req.restaurat.id;
       let id = req.params.id;
       if (!id)
         return res.status(400).send({ message: "Resourses are not fetched" });
@@ -404,6 +418,16 @@ const RestaurantCOntroller = {
       if (!saveResult)
         return res.status(400).send({ message: "Resourses are not fetched" });
 
+      const retrieRestarurantData = await Restaurant.findById(
+        restuarant
+      ).exec();
+      const StaffEmailData = {
+        staffname: employeeName,
+        resName: retrieRestarurantData.name,
+        staffEmail: employeeEmail,
+        resEmail: retrieRestarurantData.owner_email,
+      };
+      composeEmailToStaff(StaffEmailData);
       res.send({
         messge: true,
       });

@@ -129,6 +129,21 @@ const DiningController = {
       orderedItem.map((item) => {
         totalAmount = totalAmount + item.foodPrice * item.foodQuantity;
       });
+      orderedItem.map(async (data) => {
+        let foodId = data.foodId;
+        let foodQuantity = data.foodQuantity;
+
+        const existingFood = await Food.findById(foodId);
+        console.log(existingFood);
+        if (existingFood.stock < foodQuantity) {
+          return res.status(400).send({
+            message: ` nsufficient quantity for food with ${existingFood.stock}`,
+          });
+        }
+        existingFood.stock -= foodQuantity;
+        await existingFood.save();
+      });
+
       const save_Order = new Order({
         tableId: foodIds[0].tableId,
         staffId: id,
@@ -140,22 +155,6 @@ const DiningController = {
       let orderResult = await save_Order.save();
       if (!orderResult)
         return res.status(400).send({ message: "Order didn't recieved" });
-
-      orderedItem.map(async (data) => {
-        let foodId = data.foodId;
-        let foodQuantity = data.foodQuantity;
-
-        const existingFood = await Food.findById(foodId);
-        console.log(existingFood);
-        if (existingFood.stock < foodQuantity) {
-          return res.status(400).send({
-            message: ` nsufficient quantity for food with ${existingFood.stock}`,
-          });
-          
-        }
-        existingFood.stock -= foodQuantity;
-        await existingFood.save();
-      });
 
       let chageTableStatus = await Table.updateOne(
         { _id: foodIds[0].tableId },

@@ -11,15 +11,13 @@ const superAdminRouter = require("./mainsystem/routers/admin");
 const resAdminRouter = require("./partialsystem/routers/resadminmanagment");
 const diningRouter = require("./partialsystem/routers/diningmanagment");
 const kitcheRouter = require("./partialsystem/routers/kitchenmanagement");
-const SocketController=require("./partialsystem/controllers/socketControllers")
-
+const posRouter=require('./partialsystem/routers/posmanagment')
+const SocketController = require("./partialsystem/controllers/socketControllers");
 
 const path = require("path");
 app.use(express.static(path.join(__dirname, "public")));
 
-
 const PORT = 5000;
-
 
 const server = app.listen(PORT, () => {
   console.log("connected");
@@ -31,11 +29,11 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      "http://localhost:5200",
-      "http://localhost:4200",
-      "http://localhost:3200",
-      "http://localhost:2200",
-      "http://localhost:1200",
+      "http://localhost:5200", // pOS application
+      "http://localhost:4200", //  super admin app
+      "http://localhost:3200", //  restaurant control app
+      "http://localhost:2200", // kitchen  app
+      "http://localhost:1200", // dining app
     ],
   })
 );
@@ -46,8 +44,7 @@ app.use("/superadmin", superAdminRouter);
 app.use("/resadmin", resAdminRouter);
 app.use("/dining", diningRouter);
 app.use("/kitchen", kitcheRouter);
-
-
+app.use("/pos", posRouter);
 
 
 module.exports = {

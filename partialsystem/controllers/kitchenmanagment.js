@@ -114,11 +114,17 @@ const KitcheController = {
       const { id } = req.params;
       const SaveResult = await Order.updateOne(
         { _id: id },
-        { $set: { cooking_Status: true } }
+        { $set: { cooking_Status: false } }
       ).exec();
-      console.log(SaveResult);
+      if (!SaveResult) 
+        return res
+          .status(400)
+          .send({ message: "Somthing went worng Please try angain" });
+
+        res.send({message:true})
     } catch (error) {
       console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
     }
   },
 

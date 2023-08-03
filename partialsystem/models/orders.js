@@ -41,10 +41,20 @@ const orderModel = new mongoose.Schema({
   },
   order_status: {
     type: Boolean,
+    default:false
   },
   cooking_Status: {
     type: Boolean,
-    default:true
+    default: true,
+  },
+  serving_Status: {
+    type: Boolean,
+    default: false,
+  },
+  expiresAt: {
+    type: Date,
+    default: Date.now, // This will set the expiration time to the current date and time by default
+    expires: "1444m", // The 'expires' option is set to '30m' to automatically delete the document after 30 minutes
   },
 });
 

@@ -25,13 +25,20 @@ module.exports = async (server) => {
     socket.on("notification", () => io.emit("foodAddes"));
 
     socket.on("loadOrders", async (id) => {
-      let orderData = await Order.find({ resId: id, cooking_Status: false })
+      let orderData = await Order.find({ resId: id })
         .populate("resId", null, Restaurnt)
         .populate("tableId", null, Tables)
         .populate("foods.food_id", null, Food)
         .exec();
       io.emit("listOrder", orderData);
-      console.log(orderData);
+    });
+    socket.on("loadOrders", async (id) => {
+      let orderData = await Order.find({ resId: id, cooking_Status: true })
+        .populate("resId", null, Restaurnt)
+        .populate("tableId", null, Tables)
+        .populate("foods.food_id", null, Food)
+        .exec();
+      io.emit("loadOrdersOnKitchen", orderData);
     });
   });
 };
