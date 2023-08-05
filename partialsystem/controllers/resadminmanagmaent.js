@@ -385,11 +385,10 @@ const RestaurantCOntroller = {
   },
   async EditStaffs(req, res) {
     try {
-      let restuarant=req.restaurat.id;
+      let restuarant = req.restaurat.id;
       let id = req.params.id;
       if (!id)
         return res.status(400).send({ message: "Resourses are not fetched" });
-
       const {
         employeeName,
         employeePlace,

@@ -2,7 +2,8 @@ const foodModel = require("../models/foods");
 const Restaurnt = require("../../mainsystem/models/restaurants");
 const Staff = require("../models/staffs");
 const Tables = require("../models/tables");
-
+const PaytmChecksum = require('PaytmChecksum');
+const https=require("https")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
@@ -112,8 +113,12 @@ const DiningController = {
   },
   async orderFood(req, res) {
     try {
+      console.log("reached");
       const { resId, id } = req.Staff;
-      const orderedItem = req.body;
+      const orderedItem = req.body.orders;
+      const table_id = req.body.table;
+
+
       let foodIds = [];
 
       let totalAmount = 0;
@@ -123,7 +128,6 @@ const DiningController = {
         note: item.foodNote,
         food_quantity: item.foodQuantity,
         food_totalprice: item.foodQuantity * item.foodPrice,
-        tableId: item.tableId,
       }));
 
       orderedItem.map((item) => {
@@ -132,20 +136,18 @@ const DiningController = {
       orderedItem.map(async (data) => {
         let foodId = data.foodId;
         let foodQuantity = data.foodQuantity;
-
+        console.log(foodQuantity);
+        
         const existingFood = await Food.findById(foodId);
-        console.log(existingFood);
-        if (existingFood.stock < foodQuantity) {
-          return res.status(400).send({
-            message: ` nsufficient quantity for food with ${existingFood.stock}`,
-          });
+        existingFood.stock = existingFood.stock - foodQuantity;
+        if (existingFood.stock < 0) {
+          existingFood.stock =0
         }
-        existingFood.stock -= foodQuantity;
         await existingFood.save();
       });
 
       const save_Order = new Order({
-        tableId: foodIds[0].tableId,
+        tableId: table_id,
         staffId: id,
         resId: resId,
         foods: foodIds,
@@ -157,7 +159,7 @@ const DiningController = {
         return res.status(400).send({ message: "Order didn't recieved" });
 
       let chageTableStatus = await Table.updateOne(
-        { _id: foodIds[0].tableId },
+        { _id: table_id },
         { $set: { table_status: true } }
       );
       if (!chageTableStatus)
@@ -200,6 +202,68 @@ const DiningController = {
       });
       // console.log(filterdData);
       res.send({ food: filterdData, count: count });
+    } catch (error) {
+      console.log(error);
+    }
+  }, async generateQRCode(req, res) {
+    try {
+
+      var paytmParams = {};
+
+      paytmParams.body = {
+        mid: "YOUR_MID_HERE",
+        orderId: "OREDRID98765",
+        amount: "1303.00",
+        businessType: "UPI_QR_CODE",
+        posId: "S12_123",
+      };
+
+      /*
+       * Generate checksum by parameters we have in body
+       * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys
+       */
+      PaytmChecksum.generateSignature(
+        JSON.stringify(paytmParams.body),
+        "YOUR_MERCHANT_KEY"
+      ).then(function (checksum) {
+        paytmParams.head = {
+          clientId: "C11",
+          version: "v1",
+          signature: checksum,
+        };
+
+        var post_data = JSON.stringify(paytmParams);
+
+        var options = {
+          /* for Staging */
+          hostname: "securegw-stage.paytm.in",
+
+          /* for Production */
+          // hostname: 'securegw.paytm.in',
+
+          port: 443,
+          path: "/paymentservices/qr/create",
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": post_data.length,
+          },
+        };
+
+        var response = "";
+        var post_req = https.request(options, function (post_res) {
+          post_res.on("data", function (chunk) {
+            response += chunk;
+          });
+
+          post_res.on("end", function () {
+            console.log("Response: ", response);
+          });
+        });
+        post_req.write(post_data);
+        console.log(post_data);
+        post_req.end();
+      });
     } catch (error) {
       console.log(error);
     }
