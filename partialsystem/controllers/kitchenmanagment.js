@@ -4,7 +4,8 @@ const Staff = require("../models/staffs");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
-let secretkey = "KitchenSecret";
+const FoodCategory = require("../models/food-category");
+let secretkey = process.env.RES_KTCHEN_TOKEN;
 const KitcheController = {
   async fetcheFoods(req, res) {
     try {
@@ -114,22 +115,33 @@ const KitcheController = {
       const { id } = req.params;
       const SaveResult = await Order.updateOne(
         { _id: id },
-        { $set: { cooking_Status: false } }
+        { $set: { order_status: "ready" } }
       ).exec();
-      if (!SaveResult) 
+      if (!SaveResult)
         return res
           .status(400)
           .send({ message: "Somthing went worng Please try angain" });
 
-        res.send({message:true})
+      res.send({ message: true });
     } catch (error) {
       console.log(error);
       return res.status(400).send({ message: "Somthing went worng" });
     }
   },
+  async listCategory(req, res) {
+    try {
+      const { id, resId } = req.Staff;
 
+      const allCategoryes = await FoodCategory.find({ resId: resId }).exec();
+      if (!allCategoryes)
+        return res.status(404).send({ message: "resourse are not found" });
+      res.send(allCategoryes);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
+    }
+  },
   async logout(req, res) {
-
     try {
       const { id } = req.Staff;
 

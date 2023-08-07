@@ -1,0 +1,1 @@
+const PaytmChecksum = require('PaytmChecksum');

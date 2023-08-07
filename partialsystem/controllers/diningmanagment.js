@@ -2,8 +2,7 @@ const foodModel = require("../models/foods");
 const Restaurnt = require("../../mainsystem/models/restaurants");
 const Staff = require("../models/staffs");
 const Tables = require("../models/tables");
-const PaytmChecksum = require('PaytmChecksum');
-const https=require("https")
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
@@ -11,7 +10,7 @@ const { default: mongoose } = require("mongoose");
 const Food = require("../models/foods");
 const Table = require("../models/tables");
 const FoodCategory = require("../models/food-category");
-let secretkey = "DinigSecret";
+let secretkey = process.env.RES_DINING_TOKEN;
 const DiningController = {
   async Login(req, res) {
     try {
@@ -118,7 +117,6 @@ const DiningController = {
       const orderedItem = req.body.orders;
       const table_id = req.body.table;
 
-
       let foodIds = [];
 
       let totalAmount = 0;
@@ -137,11 +135,11 @@ const DiningController = {
         let foodId = data.foodId;
         let foodQuantity = data.foodQuantity;
         console.log(foodQuantity);
-        
+
         const existingFood = await Food.findById(foodId);
         existingFood.stock = existingFood.stock - foodQuantity;
         if (existingFood.stock < 0) {
-          existingFood.stock =0
+          existingFood.stock = 0;
         }
         await existingFood.save();
       });
@@ -152,7 +150,7 @@ const DiningController = {
         resId: resId,
         foods: foodIds,
         total_price: totalAmount,
-        order_status: true,
+        order_status: "pendding",
       });
       let orderResult = await save_Order.save();
       if (!orderResult)
@@ -205,67 +203,23 @@ const DiningController = {
     } catch (error) {
       console.log(error);
     }
-  }, async generateQRCode(req, res) {
+  },
+  async updateServeStatus(req, res) {
     try {
+      const { id } = req.params;
+      const SaveResult = await Order.updateOne(
+        { _id: id },
+        { $set: { order_status: "served" } }
+      ).exec();
+      if (!SaveResult)
+        return res
+          .status(400)
+          .send({ message: "Somthing went worng Please try angain" });
 
-      var paytmParams = {};
-
-      paytmParams.body = {
-        mid: "YOUR_MID_HERE",
-        orderId: "OREDRID98765",
-        amount: "1303.00",
-        businessType: "UPI_QR_CODE",
-        posId: "S12_123",
-      };
-
-      /*
-       * Generate checksum by parameters we have in body
-       * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys
-       */
-      PaytmChecksum.generateSignature(
-        JSON.stringify(paytmParams.body),
-        "YOUR_MERCHANT_KEY"
-      ).then(function (checksum) {
-        paytmParams.head = {
-          clientId: "C11",
-          version: "v1",
-          signature: checksum,
-        };
-
-        var post_data = JSON.stringify(paytmParams);
-
-        var options = {
-          /* for Staging */
-          hostname: "securegw-stage.paytm.in",
-
-          /* for Production */
-          // hostname: 'securegw.paytm.in',
-
-          port: 443,
-          path: "/paymentservices/qr/create",
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Content-Length": post_data.length,
-          },
-        };
-
-        var response = "";
-        var post_req = https.request(options, function (post_res) {
-          post_res.on("data", function (chunk) {
-            response += chunk;
-          });
-
-          post_res.on("end", function () {
-            console.log("Response: ", response);
-          });
-        });
-        post_req.write(post_data);
-        console.log(post_data);
-        post_req.end();
-      });
+      res.send({ message: true });
     } catch (error) {
       console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
     }
   },
   async logout(req, res) {

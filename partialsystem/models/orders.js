@@ -40,22 +40,15 @@ const orderModel = new mongoose.Schema({
     type: Number,
   },
   order_status: {
-    type: Boolean,
-    default:false
-  },
-  cooking_Status: {
-    type: Boolean,
-    default: true,
-  },
-  serving_Status: {
-    type: Boolean,
-    default: false,
+    type: String,
+    default:'pendding'
   },
   expiresAt: {
     type: Date,
     default: Date.now, // This will set the expiration time to the current date and time by default
     expires: "1444m", // The 'expires' option is set to '30m' to automatically delete the document after 30 minutes
   },
+  
 });
 
 const Order = dbDining.model("order", orderModel);

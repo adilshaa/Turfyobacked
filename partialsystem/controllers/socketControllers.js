@@ -33,12 +33,30 @@ module.exports = async (server) => {
       io.emit("listOrder", orderData);
     });
     socket.on("loadOrders", async (id) => {
-      let orderData = await Order.find({ resId: id, cooking_Status: true })
+      let orderData = await Order.find({ resId: id, order_status: 'pendding' })
         .populate("resId", null, Restaurnt)
         .populate("tableId", null, Tables)
         .populate("foods.food_id", null, Food)
         .exec();
       io.emit("loadOrdersOnKitchen", orderData);
+    });
+    socket.on("loadOrders", async (id) => {
+      let orderData = await Order.find({ resId: id })
+        .populate("resId", null, Restaurnt)
+        .populate("tableId", null, Tables)
+        .populate("foods.food_id", null, Food)
+        .exec();
+      io.emit("loadAllOrders", orderData);
+    });
+    socket.on("loadOrders", async (id) => {
+      let orderData = await Order.find({ resId: id })
+        .populate("resId", null, Restaurnt)
+        .populate("tableId", null, Tables)
+        .populate("foods.food_id", null, Food)
+        .populate("staffId", null, Staff)
+
+        .exec();
+      io.emit("loadordersToCounter", orderData);
     });
   });
 };

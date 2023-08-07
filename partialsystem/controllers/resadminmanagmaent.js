@@ -8,8 +8,8 @@ const Restaurant = require("../../mainsystem/models/restaurants");
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { composeEmailToStaff } = require("../mail/nodemail");
-const secretKey = "ResturantAdminkey";
+const { composeEmailToStaff } = require("../api/nodemail");
+const secretKey = process.env.RES_ADMIN_TOKEN;
 const RestaurantCOntroller = {
   async ControlllerLogin(req, res) {
     try {
