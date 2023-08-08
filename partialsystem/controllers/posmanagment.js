@@ -1,9 +1,13 @@
 const Staff = require("../models/staffs");
 const Restaurnt = require("../../mainsystem/models/restaurants");
+const Order_history = require("../models/order_history");
+const Order = require("../models/orders");
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const https = require("https");
 const PaytmChecksum = require("PaytmChecksum");
+const Table = require("../models/tables");
 
 const secretkey = process.env.RES_POS_TOKEN;
 const posController = {
@@ -136,8 +140,45 @@ const posController = {
     try {
       const orderId = req.params.id;
 
-      
-    } catch (error) { }
+      let order;
+      console.log("hey");
+      order = await Order.findOne({ _id: orderId });
+      if (!order) return;
+      let allFoods = order.foods.map((item) => ({
+        food_id: item.food_id,
+        food_Name: item.food_id.name,
+        food_quantity: item.food_quantity,
+        food_amount: item.food_totalprice / item.food_quantity,
+        food_total_amount: item.food_totalprice,
+      }));
+
+      const SaveOrderHistory = new Order_history({
+        order_Staff: { staff_id: order.staffId, res_id: order.resId },
+        res_id: order.resId,
+        Order_id: undefined,
+        Total_order_Amount: order.total_price,
+        Total_foods: order.foods.length,
+        Ordered_foods: allFoods,
+        Ordered_table: order.tableId,
+        payment_method: undefined,
+      });
+      const thenSavingOrderHistory = await SaveOrderHistory.save();
+      if (!thenSavingOrderHistory) return false;
+
+      const changeTableStatus = await Table.updateOne(
+        { _id: order.tableId },
+        { $set: { table_status: false } }
+      ).exec();
+      if (!changeTableStatus) return false;
+      let delteOrder = await Order.deleteOne({ _id: order._id }).exec();
+      if (!delteOrder) return false;
+
+      res.send({ message: true });
+      console.log("order delted sucess fully");
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
+    }
   },
 };
 module.exports = posController;

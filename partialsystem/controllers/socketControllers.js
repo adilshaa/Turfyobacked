@@ -4,8 +4,9 @@ const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
 const Restaurnt = require("../../mainsystem/models/restaurants");
 const Staff = require("../models/staffs");
-const Tables = require("../models/tables");
+const Table = require("../models/tables");
 const FoodCategory = require("../models/food-category");
+const Order_history = require("../models/order_history");
 module.exports = async (server) => {
   const io = require("socket.io")(server, {
     cors: {
@@ -27,15 +28,15 @@ module.exports = async (server) => {
     socket.on("loadOrders", async (id) => {
       let orderData = await Order.find({ resId: id })
         .populate("resId", null, Restaurnt)
-        .populate("tableId", null, Tables)
+        .populate("tableId", null, Table)
         .populate("foods.food_id", null, Food)
         .exec();
       io.emit("listOrder", orderData);
     });
     socket.on("loadOrders", async (id) => {
-      let orderData = await Order.find({ resId: id, order_status: 'pendding' })
+      let orderData = await Order.find({ resId: id, order_status: "pendding" })
         .populate("resId", null, Restaurnt)
-        .populate("tableId", null, Tables)
+        .populate("tableId", null, Table)
         .populate("foods.food_id", null, Food)
         .exec();
       io.emit("loadOrdersOnKitchen", orderData);
@@ -43,7 +44,7 @@ module.exports = async (server) => {
     socket.on("loadOrders", async (id) => {
       let orderData = await Order.find({ resId: id })
         .populate("resId", null, Restaurnt)
-        .populate("tableId", null, Tables)
+        .populate("tableId", null, Table)
         .populate("foods.food_id", null, Food)
         .exec();
       io.emit("loadAllOrders", orderData);
@@ -51,12 +52,20 @@ module.exports = async (server) => {
     socket.on("loadOrders", async (id) => {
       let orderData = await Order.find({ resId: id })
         .populate("resId", null, Restaurnt)
-        .populate("tableId", null, Tables)
+        .populate("tableId", null, Table)
         .populate("foods.food_id", null, Food)
         .populate("staffId", null, Staff)
-
         .exec();
       io.emit("loadordersToCounter", orderData);
     });
+      socket.on("loadToOrdersHistory", async (id) => {
+        let orderData = await Order_history.find({ res_id: id })
+          .populate("res_id", null, Restaurnt)
+          .populate("Ordered_table", null, Table)
+          .populate("Ordered_foods.food_id", null, Food)
+          .populate("order_Staff.staff_id", null, Staff)
+          .exec();
+        io.emit("listorderHistories", orderData);
+      });
   });
 };
