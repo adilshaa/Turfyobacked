@@ -146,7 +146,6 @@ const DiningController = {
 
       const save_Order = new Order({
         tableId: table_id,
-        
         staffId: id,
         resId: resId,
         foods: foodIds,

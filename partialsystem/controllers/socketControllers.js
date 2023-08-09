@@ -33,7 +33,7 @@ module.exports = async (server) => {
         .exec();
       io.emit("listOrder", orderData);
     });
-    socket.on("loadOrders", async (id) => {
+    socket.on("loadOrderskitcheside", async (id) => {
       let orderData = await Order.find({ resId: id, order_status: "pendding" })
         .populate("resId", null, Restaurnt)
         .populate("tableId", null, Table)
@@ -65,7 +65,9 @@ module.exports = async (server) => {
           .populate("Ordered_foods.food_id", null, Food)
           .populate("order_Staff.staff_id", null, Staff)
           .exec();
-        io.emit("listorderHistories", orderData);
+        io.emit("listorderHistories", orderData,);
+        io.emit('NotifyNewOrder',true)
+
       });
   });
 };
