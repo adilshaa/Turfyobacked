@@ -1,25 +1,36 @@
 const mongoose = require("mongoose");
 // const resoMdel = require("../models/restaurants");
-
-let TurfyoADmin = mongoose.createConnection("mongodb://127.0.0.1:27017/turfyoData", {
+require('dotenv').config()
+let TurfyoADmin = mongoose.createConnection(process.env.MONGOOSE_OXRES_DATA, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-let dbResAdmins= mongoose.createConnection(`mongodb://127.0.0.1:27017/adminsData`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+let dbResAdmins = mongoose.createConnection(
+  process.env.MONGOOSE_RESTAURANT_DATA,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
-let dbKitchen = mongoose.createConnection(`mongodb://127.0.0.1:27017/kitchensData`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+let dbKitchen = mongoose.createConnection(
+  process.env.MONGOOSE_KITHCEN_DATA,
 
-let dbDining = mongoose.createConnection(`mongodb://127.0.0.1:27017/DiningData`, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
+
+let dbDining = mongoose.createConnection(
+  process.env.MONGOOSE_DINING_DATA,
+
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 module.exports = {
   TurfyoADmin: TurfyoADmin,
   dbResAdmins: dbResAdmins,

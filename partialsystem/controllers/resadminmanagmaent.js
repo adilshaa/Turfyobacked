@@ -17,12 +17,12 @@ const RestaurantCOntroller = {
       const retriveData = await Restaurant.findOne({
         owner_email: email,
       }).exec();
-      if (!retriveData && retriveData.owner_email != email)
-        return res.status(400).send({ message: "Your not authenticated" });
+      if (!retriveData || retriveData.owner_email != email)
+        return res.status(400).send({ message: "Emial is not authenticated" });
 
       const matchingPasswaord = bcrypt.compare(retriveData.password, password);
       if (!matchingPasswaord)
-        return res.status(400).send({ message: "Your not authenticated" });
+        return res.status(400).send({ message: "incorrect password" });
 
       const updateStatus = await Restaurant.updateOne(
         { _id: retriveData._id },
@@ -35,8 +35,7 @@ const RestaurantCOntroller = {
       const payload = {
         id: _id,
       };
-      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
-      composeEmailToStaff();
+      const token = jwt.sign(payload, secretKey, { expiresIn: "100h" });
 
       res.send({
         resId: retriveData._id,
@@ -50,6 +49,7 @@ const RestaurantCOntroller = {
       });
     }
   },
+
   async ControlllerLoginWithGoogle(req, res) {
     try {
       const email = req.body.email;
@@ -74,7 +74,7 @@ const RestaurantCOntroller = {
         resId: retrivedata._id,
         id: _id,
       };
-      const token = jwt.sign(payload, secretKey, { expiresIn: "1h" });
+      const token = jwt.sign(payload, secretKey, { expiresIn: "100h" });
 
       res.send({
         resId: retrivedata._id,
@@ -385,8 +385,8 @@ const RestaurantCOntroller = {
   },
   async EditStaffs(req, res) {
     try {
-      let restuarant = req.restaurat.id;
-      let id = req.params.id;
+      let restuarant = req.restuarant.id;
+      let { id } = req.params;
       if (!id)
         return res.status(400).send({ message: "Resourses are not fetched" });
       const {
@@ -420,20 +420,21 @@ const RestaurantCOntroller = {
       const retrieRestarurantData = await Restaurant.findById(
         restuarant
       ).exec();
-      const StaffEmailData = {
-        staffname: employeeName,
-        resName: retrieRestarurantData.name,
-        staffEmail: employeeEmail,
-        resEmail: retrieRestarurantData.owner_email,
-      };
-      composeEmailToStaff(StaffEmailData);
+
+      // const StaffEmailData = {
+      //   staffname: employeeName,
+      //   resName: retrieRestarurantData.name,
+      //   staffEmail: employeeEmail,
+      //   resEmail: retrieRestarurantData.owner_email,
+      // };
+      // composeEmailToStaff(StaffEmailData);
       res.send({
         messge: true,
       });
     } catch (error) {
       console.log(error);
       res.status(500).send({
-        message: "Server Error",
+        message: "Server somthing went worng",
       });
     }
   },
@@ -459,7 +460,9 @@ const RestaurantCOntroller = {
 
   async fetchstocks(req, res) {
     try {
-      const fetchAllStoks = await Stock.find({}).exec();
+      let restuarant = req.restuarant.id;
+
+      const fetchAllStoks = await Stock.find({ _id: restuarant }).exec();
       if (!fetchAllStoks)
         return res.status(404).send({ message: "resorse not fetched " });
       res.send(fetchAllStoks);
@@ -584,14 +587,50 @@ const RestaurantCOntroller = {
           message: "data not saved",
         });
       await TableData.save();
+      let tables = await Table.find({ restaurant_id: id });
       res.send({
         message: "Sucess",
+        tables: tables,
       });
     } catch (error) {
       console.log(error);
       return res.status(404).send({
         message: "Somthing went wrong",
       });
+    }
+  },
+  async delteTable(req, res) {
+    try {
+      console.log("heare");
+      const tableId = req.params.id;
+      const resid = req.restuarant.id;
+      let deltingTable = await Table.findOne({
+        _id: tableId,
+        restaurant_id: resid,
+      });
+      // if (!deletedTable)
+      //   return res.status(404).json({ error: "Table not found" });
+      // console.log(deletedTable);
+      const reminingTable = await Table.find({
+        table_No: { $gt: deltingTable.table_No },
+        restaurant_id: deltingTable.restaurant_id,
+      });
+
+      for (let tables of reminingTable) {
+        tables.table_No -= 1;
+        await tables.save();
+      }
+
+      const deletedTable = await Table.deleteOne({ _id: tableId }).exec();
+
+      let tables = await Table.find({
+        restaurant_id: resid,
+        restaurant_id: resid,
+      });
+      res.send({ message: true, tables: tables });
+    } catch (error) {
+      console.log(error);
+      return res.status(404).send({ message: "Somthing went worng" });
     }
   },
   async getTables(req, res) {

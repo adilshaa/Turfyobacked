@@ -1,6 +1,7 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 const composeEmailToStaff = (data) => {
+  console.log(process.env.email_id, process.env.pass);
   let mailTransporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

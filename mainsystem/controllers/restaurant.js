@@ -14,7 +14,7 @@ const SuperAdminResataurantController = {
         .exec();
       if (retriveData)
         return res.status(404).send({ message: "Your Already registered" });
-      
+
       const saveData = new restaurantModel({
         owner_name: name,
         owner_email: email,
@@ -45,30 +45,39 @@ const SuperAdminResataurantController = {
   },
   async register(req, res) {
     try {
-      let resId = req.params.id;
-      let email = req.body.owner_email;
-      const retriveData = await restaurantModel.findOne({ _id: resId }).exec();
-      if (!retriveData || retriveData.owner_email != email)
-        return res.status(404).send({ message: "Your Not authenticated" });
-
-      let { name, place, password, owner_number } = req.body;
+      console.log("hello");
+      let { name, place, password, owner_email, owner_number } = req.body;
+      const retriveData = await restaurantModel
+        .findOne({ owner_email: owner_email })
+        .exec();
+      if (retriveData)
+        return res
+          .status(404)
+          .send({ message: "This account already registered" });
 
       const salt = await bcrypt.genSalt(10);
       let encryptPassword = await bcrypt.hash(password, salt);
       if (!encryptPassword)
         return res.status(404).send({ message: "Your Not authenticated" });
-      let updatedData = {
+      // let updatedData = {
+      //   name: name,
+      //   place: place,
+      //   owner_email: owner_email,
+      //   password: encryptPassword,
+      //   owner_number: owner_number,
+      //   status: false,
+      // };
+      const saveData = new restaurantModel({
         name: name,
         place: place,
+        owner_email: owner_email,
         password: encryptPassword,
         owner_number: owner_number,
         status: false,
-      };
-      const saveRemaingDatas = await restaurantModel
-        .findOneAndUpdate({ owner_email: retriveData.owner_email }, updatedData)
-        .exec();
-      if (!saveRemaingDatas)
-        return res.status(404).send({ message: "Data not fetched" });
+      });
+      const saveResult = await saveData.save();
+      if (!saveResult)
+        return res.status(404).send({ message: "Datas are not saved " });
       res.send({ message: "sucess" });
     } catch (error) {
       console.log(error);

@@ -3,7 +3,7 @@ const { dbDining } = require("../../connection/Dbconnection");
 const TablesModel = new Schema({
   table_Name: {
     type: String,
-    rwquried: true,
+    requried: true,
   },
   table_No: {
     type: Number,

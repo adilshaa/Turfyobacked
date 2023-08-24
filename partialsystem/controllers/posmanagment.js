@@ -8,6 +8,9 @@ const jwt = require("jsonwebtoken");
 const https = require("https");
 const PaytmChecksum = require("PaytmChecksum");
 const Table = require("../models/tables");
+const { log } = require("console");
+const { stat } = require("fs");
+const Food = require("../models/foods");
 
 const secretkey = process.env.RES_POS_TOKEN;
 const posController = {
@@ -139,9 +142,11 @@ const posController = {
   async ProceedOrder(req, res) {
     try {
       const orderId = req.params.id;
-
+      console.log(req.body);
+      const paymentMethod = req.body.paymentType;
+      if (req.body.paymentType == "") return;
       let order;
-      console.log("hey");
+
       order = await Order.findOne({ _id: orderId });
       if (!order) return;
       let allFoods = order.foods.map((item) => ({
@@ -149,18 +154,20 @@ const posController = {
         food_Name: item.food_id.name,
         food_quantity: item.food_quantity,
         food_amount: item.food_totalprice / item.food_quantity,
+        payment_method: paymentMethod,
         food_total_amount: item.food_totalprice,
       }));
 
       const SaveOrderHistory = new Order_history({
         order_Staff: { staff_id: order.staffId, res_id: order.resId },
         res_id: order.resId,
-        Order_id: undefined,
+        Order_id: order.orderId,
         Total_order_Amount: order.total_price,
         Total_foods: order.foods.length,
         Ordered_foods: allFoods,
         Ordered_table: order.tableId,
-        payment_method: undefined,
+        order_date: Date.now(),
+        payment_method: req.body.paymentType,
       });
       const thenSavingOrderHistory = await SaveOrderHistory.save();
       if (!thenSavingOrderHistory) return false;
@@ -175,6 +182,48 @@ const posController = {
 
       res.send({ message: true });
       console.log("order delted sucess fully");
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
+    }
+  },
+  async filterSales(req, res) {
+    try {
+      const { start, end } = req.body;
+      if (start > end) {
+        return res.status(404).send({ message: "Enter any valid Date" });
+      }
+      const FilteredData = await Order_history.find({
+        order_date: { $gte: start, $lte: end },
+      })
+        .populate("res_id", null, Restaurnt)
+        .populate("Ordered_table", null, Table)
+        .populate("Ordered_foods.food_id", null, Food)
+        .populate("order_Staff.staff_id", null, Staff)
+        .exec();
+      if (FilteredData == undefined) {
+        return res.status(404).send({ message: "Enter any valid Date" });
+      }
+      res.send(FilteredData);
+      console.log(FilteredData);
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send({ message: "Somthing went worng" });
+    }
+  },
+  async takeCurrentorder(req, res) {
+    try {
+      const { id } = req.params;
+      const findOrder = await Order.findOne({ _id: id })
+        .populate("resId", null, Restaurnt)
+        .populate("tableId", null, Table)
+        .populate("foods.food_id", null, Food)
+        .populate("staffId", null, Staff)
+        .exec();
+      if (!findOrder)
+        return res.status(404).send({ message: "Data Not found " });
+      console.log(findOrder);
+      res.send(findOrder);
     } catch (error) {
       console.log(error);
       return res.status(400).send({ message: "Somthing went worng" });

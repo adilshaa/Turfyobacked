@@ -25,7 +25,7 @@ const OrderhistoryModel = new mongoose.Schema({
   },
   order_date: {
     type: Date,
-    default: Date.now, // This will set the expiration time to the current date and time by default
+    required: true, // This will set the expiration time to the current date and time by default
   },
   Order_id: {
     type: String,

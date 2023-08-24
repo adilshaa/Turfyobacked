@@ -8,7 +8,7 @@ Router.use(bosy_parser.urlencoded({ extended: true }));
 
 const restaurantController = require("../controllers/restaurant");
 
-Router.post("/resgister/:id", restaurantController.register);
+Router.post("/resgister", restaurantController.register);
 Router.get("/get_allRestaurant", restaurantController.getRestaurantsData);
 Router.get("/full_details/:id", restaurantController.getFullDetails);
 Router.post("/list_restaurants/:id", restaurantController.listrestaurant);

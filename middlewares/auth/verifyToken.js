@@ -6,9 +6,9 @@ const posSecret = process.env.RES_POS_TOKEN;
 require("dotenv").config();
 const resAdmintokenVerify = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json("You are not authenticated");
+  if (!authHeader) return res.status(401).json("You are not authenticated 1");
   const token = authHeader.split(" ")[1];
-  if (!token) return res.status(401).json("You are not authenticated");
+  if (!token) return res.status(401).json("You are not authenticated 2");
   jwt.verify(token, Ressecret, (err, user) => {
     if (err) return res.status(401).json("Invalid token");
     req.restuarant = user;
@@ -18,11 +18,11 @@ const resAdmintokenVerify = (req, res, next) => {
 
 const dinigStaffsVerify = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json("You are not authenticated");
+  if (!authHeader) return res.status(401).json("You are not authenticated 1");
   const token = authHeader.split(" ")[1];
-  if (!token) return res.status(401).json("You are not authenticated");
+  if (!token) return res.status(401).json("You are not authenticated 2");
   jwt.verify(token, dinigSecret, (err, staff) => {
-    if (err) return res.status(401).json("Your not authenticated");
+    if (err) return res.status(401).json("Your not authenticated 3");
     req.Staff = staff;
     next();
   });
@@ -51,6 +51,7 @@ const verifyPos = (req, res, next) => {
     next();
   });
 };
+
 
 module.exports = {
   resAdmintokenVerify,

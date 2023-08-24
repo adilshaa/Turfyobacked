@@ -4,6 +4,7 @@ const Staff = require("../models/staffs");
 const Tables = require("../models/tables");
 
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Order = require("../models/orders");
 const { default: mongoose } = require("mongoose");
@@ -116,6 +117,7 @@ const DiningController = {
       const { resId, id } = req.Staff;
       const orderedItem = req.body.orders;
       const table_id = req.body.table;
+      const orderid = crypto.randomBytes(8).toString("hex").toUpperCase();
 
       let foodIds = [];
 
@@ -143,14 +145,14 @@ const DiningController = {
         }
         await existingFood.save();
       });
-
       const save_Order = new Order({
         tableId: table_id,
         staffId: id,
         resId: resId,
         foods: foodIds,
+        orderId: orderid,
         total_price: totalAmount,
-        order_status: "pendding",
+        order_status: "pending",
       });
       let orderResult = await save_Order.save();
       if (!orderResult)
