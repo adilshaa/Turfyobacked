@@ -10,7 +10,13 @@ const OrderHistory = require("../models/order_history");
 module.exports = (server) => {
   const io = require("socket.io")(server, {
     cors: {
-      origin: "*",
+      origin: [
+        "https://oxres-pos.netlify.app", // pOS application
+        "https://oxres-superadmin.netlify.app", //  super admin app
+        "https://oxres-rescontrols.netlify.app", //  restaurant control app
+        "https://oxres-pos.netlify.app", // kitchen  app
+        "https://oxres-dining.netlify.app", // dining app
+      ],
     },
   });
 
@@ -176,7 +182,7 @@ module.exports = (server) => {
     socket.on("loadAllOrders", (datas) => {
       loadOrders(datas);
     });
-    
+
     socket.on("loadOrdersCounter", (datas) => {
       loadOrders(datas);
     });
