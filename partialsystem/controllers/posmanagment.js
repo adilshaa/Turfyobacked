@@ -6,7 +6,6 @@ const Order = require("../models/orders");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const https = require("https");
-const PaytmChecksum = require("PaytmChecksum");
 const Table = require("../models/tables");
 const { log } = require("console");
 const { stat } = require("fs");
