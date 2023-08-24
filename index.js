@@ -29,15 +29,15 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      "https://oxres-pos.netlify.app", // pOS application
-      "https://oxres-superadmin.netlify.app", //  super admin app
-      "https://oxres-rescontrols.netlify.app", //  restaurant control app
-      "https://oxres-pos.netlify.app", // kitchen  app
-      "https://oxres-dining.netlify.app", // dining app
+      // "https://oxres-pos.netlify.app", // pOS application
+      // "https://oxres-superadmin.netlify.app", //  super admin app
+      // "https://oxres-rescontrols.netlify.app", //  restaurant control app
+      // "https://oxres-pos.netlify.app", // kitchen  app
+      // "https://oxres-dining.netlify.app", // dining app
+      '*'
     ],
   })
 );
-
 
 app.use("/restaurants", restaurantRouter);
 app.use("/superadmin", superAdminRouter);
