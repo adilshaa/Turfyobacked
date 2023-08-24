@@ -29,7 +29,6 @@ app.use(
   cors({
     credentials: true,
     origin: [
-     
       "http://localhost:4200", // pOS application
       "http://localhost:3200", //  super admin app
       "http://localhost:2200", //  restaurant control app
