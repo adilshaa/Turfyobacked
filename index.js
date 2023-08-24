@@ -11,7 +11,7 @@ const superAdminRouter = require("./mainsystem/routers/admin");
 const resAdminRouter = require("./partialsystem/routers/resadminmanagment");
 const diningRouter = require("./partialsystem/routers/diningmanagment");
 const kitcheRouter = require("./partialsystem/routers/kitchenmanagement");
-const posRouter=require('./partialsystem/routers/posmanagment')
+const posRouter = require("./partialsystem/routers/posmanagment");
 const SocketController = require("./partialsystem/controllers/socketControllers");
 
 const path = require("path");
@@ -29,12 +29,18 @@ app.use(
   cors({
     credentials: true,
     origin: [
+     
+      "http://localhost:4200", // pOS application
+      "http://localhost:3200", //  super admin app
+      "http://localhost:2200", //  restaurant control app
+      "http://localhost:1200", // kitchen  app
+      "http://localhost:5200", // dining app
+
       // "https://oxres-pos.netlify.app", // pOS application
       // "https://oxres-superadmin.netlify.app", //  super admin app
       // "https://oxres-rescontrols.netlify.app", //  restaurant control app
       // "https://oxres-pos.netlify.app", // kitchen  app
       // "https://oxres-dining.netlify.app", // dining app
-      '*'
     ],
   })
 );
@@ -45,7 +51,6 @@ app.use("/resadmin", resAdminRouter);
 app.use("/dining", diningRouter);
 app.use("/kitchen", kitcheRouter);
 app.use("/pos", posRouter);
-
 
 module.exports = {
   app,
