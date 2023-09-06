@@ -29,11 +29,11 @@ app.use(
   cors({
     credentials: true,
     origin: [
-      "http://localhost:4200", // pOS application
-      "http://localhost:3200", //  super admin app
-      "http://localhost:2200", //  restaurant control app
-      "http://localhost:1200", // kitchen  app
-      "http://localhost:5200", // dining app
+      // "http://localhost:4200", // pOS application
+      // "http://localhost:3200", //  super admin app
+      // "http://localhost:2200", //  restaurant control app
+      // "http://localhost:1200", // kitchen  app
+      // "http://localhost:5200", // dining app
       
       "https://oxres-kitchen.netlify.app", // pOS application
       "https://oxres-superadmin.netlify.app", //  super admin app
