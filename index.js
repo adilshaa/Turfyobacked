@@ -34,12 +34,12 @@ app.use(
       "http://localhost:2200", //  restaurant control app
       "http://localhost:1200", // kitchen  app
       "http://localhost:5200", // dining app
-
-      // "https://oxres-pos.netlify.app", // pOS application
-      // "https://oxres-superadmin.netlify.app", //  super admin app
-      // "https://oxres-rescontrols.netlify.app", //  restaurant control app
-      // "https://oxres-pos.netlify.app", // kitchen  app
-      // "https://oxres-dining.netlify.app", // dining app
+      
+      "https://oxres-kitchen.netlify.app", // pOS application
+      "https://oxres-superadmin.netlify.app", //  super admin app
+      "https://oxres-rescontrols.netlify.app", //  restaurant control app
+      "https://oxres-pos.netlify.app", // kitchen  app
+      "https://oxres-dining.netlify.app", // dining app
     ],
   })
 );

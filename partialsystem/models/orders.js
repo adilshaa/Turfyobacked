@@ -47,11 +47,11 @@ const orderModel = new mongoose.Schema({
     type: String,
     required: true,
   },
-  expiresAt: {
-    type: Date,
-    default: Date.now, // This will set the expiration time to the current date and time by default
-    expires: "1444m", // The 'expires' option is set to '30m' to automatically delete the document after 30 minutes
-  },
+  // expiresAt: {
+  //   type: Date,
+  //   default: Date.now, // This will set the expiration time to the current date and time by default
+  //   expires: "1444m", // The 'expires' option is set to '30m' to automatically delete the document after 30 minutes
+  // },
 });
 
 const Order = dbDining.model("order", orderModel);
