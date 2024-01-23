@@ -82,7 +82,11 @@ Router.post(
   resadminController.updateStcok
 );
 Router.get("/createTable", resAdmintokenVerify, resadminController.createTable);
-Router.delete("/deletetable/:id",resAdmintokenVerify,resadminController.delteTable);
+Router.delete(
+  "/deletetable/:id",
+  resAdmintokenVerify,
+  resadminController.delteTable
+);
 Router.get("/getTables", resAdmintokenVerify, resadminController.getTables);
 Router.get("/logout", resAdmintokenVerify, resadminController.LogoutAdmin);
 

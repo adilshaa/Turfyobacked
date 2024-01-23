@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const body_parser = require("body-parser");
+const helmet = require("helmet");
 
 app.use(body_parser.json());
 app.use(body_parser.urlencoded({ extended: true }));
@@ -24,6 +25,17 @@ const server = app.listen(PORT, () => {
 });
 
 SocketController(server);
+
+
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "trusted-scripts.com"],
+      // Add other directives as needed
+    },
+  })
+);
 
 app.use(
   cors({

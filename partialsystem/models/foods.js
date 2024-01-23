@@ -13,7 +13,6 @@ const foodsData = new mongoose.Schema({
     ref: "foodcategory",
   },
   price: {
-    
     type: Number,
   },
   image: {
